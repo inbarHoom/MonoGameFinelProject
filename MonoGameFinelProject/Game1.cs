@@ -24,6 +24,8 @@ public class Game1 : Game
         ScreenSize.Y = _graphics.PreferredBackBufferHeight;
     }
 
+    public static bool GameOver { get; set; }
+
     protected override void Initialize()
     {
         // TODO: Add your initialization logic here
@@ -58,9 +60,9 @@ public class Game1 : Game
     {
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
-        SceneManager.Instance.Update(gameTime);
+            Exit(); 
+        if(!GameOver)
+            SceneManager.Instance.Update(gameTime);
         base.Update(gameTime);
     }
 

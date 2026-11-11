@@ -37,7 +37,7 @@ public class Animation : Sprite
     {
         this.looping = isLooping;
         this.samples = samples;
-        this.lastFrameHoldElapsed = lastFrameHoldSeconds;
+        this.lastFrameHoldSeconds = lastFrameHoldSeconds;
         Reset();
         isAnimating = true;
     }
@@ -117,7 +117,8 @@ public class Animation : Sprite
             if (lastFrameHoldElapsed >= lastFrameHoldSeconds)
             {
                 holdingLastFrame = false;
-                isAnimating = true;
+                isAnimating = false;
+                isFinished = true;
             }
         }
         else if (CanMoveToNextFrame(gameTime))

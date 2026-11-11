@@ -1,9 +1,12 @@
+using System;
+using System.Diagnostics;
+
 namespace MonoGameFinelProject;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-public class Player : Animation
+public class Player : Animation, IDamagable, IHealable
 {
     private const string Idle = "MartialHeroIdle";
     private const string Run = "MartialHeroRun";
@@ -25,20 +28,24 @@ public class Player : Animation
         Fall,
         Death
     }
+    
+    
     public float speed = 500f;
     public Collider collider { get; set; }
     private e_PlayerAction _action =  e_PlayerAction.Idle;
     private KeyboardState prevKeyboard;
+    // jump
     private bool isAirborne;
     private float groundY;
     private float verticalVelocity;
-    
     private const float gravity = 1800f;
     private const float jumpVelocity = -800f;
-    
+    // attack combo
     private bool comboWindowOpen;
     private float comboWindowRemaining;
     private const float ComboWindowSeconds = 0.2f;
+
+    private readonly Health _health = new Health(100);
     public Player() : base(Idle)
     {
         _transform._position = new Vector2(100, 500);
@@ -49,6 +56,23 @@ public class Player : Animation
 
         PlayAnimation(isLooping: true, samples: 10);
     }
+
+    public void TakeDamage(int amount)
+    {
+        _health.TakeDamage(amount);
+        _action = e_PlayerAction.Hit;
+        StartAnimation(Hit,e_PlayerAction.Hit,false,4);
+        if (_health.Current <= 0)
+            Die();
+    }
+
+    public void Die()
+    {
+        _action = e_PlayerAction.Death;
+        StartAnimation(Death, e_PlayerAction.Death,false,6);
+    }
+
+    public void Heal(int amount) => _health.Heal(amount);
 
     private bool WasPressed(KeyboardState keyboard, Keys key)
     {
@@ -82,6 +106,7 @@ public class Player : Animation
         bool lightAtkPressed = WasPressed(keyboard, Keys.J);
         bool heavyAtkPressed = WasPressed(keyboard, Keys.K);
         bool jumpPressed = WasPressed(keyboard, Keys.Space);
+        if(WasPressed(keyboard,Keys.B)) TakeDamage(20);
 
         Vector2 position = _transform._position;
 
@@ -99,8 +124,18 @@ public class Player : Animation
 
         bool moving = horizontal != 0;
 
+        if (_action == e_PlayerAction.Hit)
+        {
+            if (isFinished)
+                ShowGroundAnimation(moving);
+        }
+        else if (_action == e_PlayerAction.Death)
+        {
+            if (isFinished)
+                Game1.GameOver = true;
+        }
         // An attack keeps playing even after its key is released.
-        if (_action == e_PlayerAction.LightAttack)
+       else  if (_action == e_PlayerAction.LightAttack)
         {
             if (isFinished && !comboWindowOpen)
             {
@@ -175,7 +210,7 @@ public class Player : Animation
         }
         else if (lightAtkPressed)
         {
-            StartAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.15);
+            StartAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.05);
         }
         else
         {
