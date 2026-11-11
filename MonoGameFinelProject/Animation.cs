@@ -2,16 +2,17 @@ namespace MonoGameFinelProject;
 using Microsoft.Xna.Framework;
 public class Animation : Sprite
 {
-      public int samples = 60;
-    
-    double totalTime = 0;
+    public int samples = 60;
+    private bool holdingLastFrame;
+    private double lastFrameHoldElapsed;
+    private double lastFrameHoldSeconds;
 
+    public bool isFinished { get; private set; }
+    private double totalTime = 0;
+    private bool looping = true;
+    private bool isAnimating = false;
     private int x = 0;
     private int y = 0;
-    
-    bool looping = true;
-    
-    bool isAnimating = false;
     public Animation(string SpriteName) : base(SpriteName)
     {
     }
@@ -23,6 +24,7 @@ public class Animation : Sprite
     
     public void ResumeAnimation()
     {
+        if(!isFinished)
         isAnimating = true;
     }
 
@@ -31,11 +33,11 @@ public class Animation : Sprite
         Reset();
     }
     
-    public void PlayAnimation(bool isLooping = true, int samples = 60)
+    public void PlayAnimation(bool isLooping = true, int samples = 60, double lastFrameHoldSeconds = 0)
     {
         this.looping = isLooping;
         this.samples = samples;
-        
+        this.lastFrameHoldElapsed = lastFrameHoldSeconds;
         Reset();
         isAnimating = true;
     }
@@ -44,7 +46,6 @@ public class Animation : Sprite
     {
         _spritesheet = SpriteManager.GetSprite(newAnimation);
         _texture = _spritesheet.texture;
-        
         Reset();
     }
 
@@ -53,35 +54,33 @@ public class Animation : Sprite
         x = y = 0;
         totalTime = 0;
         isAnimating = false;
-        _sourceRectangle = _spritesheet[0, 0];
+        holdingLastFrame = false;
+        lastFrameHoldElapsed = 0;
+        isFinished = false;
+        _sourceRectangle = _spritesheet[x, y];
 
     }
-
     bool CanMoveToNextFrame(GameTime gameTime)
     {
-        if (!isAnimating) return false;
+        if (!isAnimating || samples <=0) return false;
+        totalTime += gameTime.ElapsedGameTime.TotalSeconds;
         
-        double deltaSeconds = gameTime.ElapsedGameTime.TotalSeconds;
-        
-        // samples - number of frames in 1 second
-        // 1/samples = fps = the time for 1 frame, then switch to next frame
-        
-        totalTime += deltaSeconds;
-        float fps = 1.0f / samples;
-        return (totalTime >= fps);
-
+        double secondsPerFrame = 1.0/ samples;
+        if(totalTime < secondsPerFrame) return false;
+        totalTime -= secondsPerFrame;
+        return true;
     }
 
     void MoveFrame()
     {
         totalTime = 0;
         x++;
-        if (x == _spritesheet.columns)
+        if (x >= _spritesheet.columns)
         {
             x = 0;
             y++;
 
-            if (y == _spritesheet.rows)
+            if (y >= _spritesheet.rows)
             {
                 if (looping)
                 {
@@ -92,19 +91,36 @@ public class Animation : Sprite
                 {
                     x = _spritesheet.columns - 1;
                     y = _spritesheet.rows - 1;
+                    isAnimating = false;
+                    if (lastFrameHoldSeconds > 0)
+                    {
+                        holdingLastFrame = true;
+                        lastFrameHoldElapsed = 0;
+                    }
+                    else
+                    {
+                        isFinished = true;
+                    }
+                    return;
                 }
-
             }
         }
-
         _sourceRectangle = _spritesheet[x, y];
     }
 
 
     public override void Update(GameTime gameTime)
     {
-        
-        if (CanMoveToNextFrame(gameTime))
+        if (holdingLastFrame)
+        {
+            lastFrameHoldElapsed += gameTime.ElapsedGameTime.TotalSeconds;
+            if (lastFrameHoldElapsed >= lastFrameHoldSeconds)
+            {
+                holdingLastFrame = false;
+                isAnimating = true;
+            }
+        }
+        else if (CanMoveToNextFrame(gameTime))
         {
             // Switch to next frame
             MoveFrame();
