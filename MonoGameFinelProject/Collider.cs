@@ -6,10 +6,17 @@ public class Collider : Sprite
 {
      public bool isTrigger { get; set; } = false;
 
+     public bool IsEnabled { get; set; } = true;
+     public bool UseCustomBounds { get; set; }
+     public Rectangle LocalBounds { get; set; }
+     
+     public bool showDebugOutline { get; set; }
+     
     public Action<Collider, Collider> onTrigger;
     public Action<Collider, Collider> onCollision;
 
     public Sprite Parent { get; set; } 
+    
 
     public Collider() : base("Pixel")
     { }
@@ -29,35 +36,58 @@ public class Collider : Sprite
     
     public override void Update(GameTime gameTime)
     {
-        if (Parent == null) return;
-        
-        _rect = Parent._rect;
-
+        if (Parent == null || !IsEnabled) return;
+        base.Update(gameTime);
+        RefreshBounds();
+        /*
+        if(!UseCustomBounds)
+            _rect = Parent._rect;
+        else
+        {
+            _rect = LocalBounds;
+        }
+        */
         // go on all colliders and check if intersect with them
         // while ignore self
         for (int i = 0; i < SceneManager.colliders.Count; i++)
         {
             Collider other = SceneManager.colliders[i];
             
-            System.Diagnostics.Debug.WriteLine(
-                $"{Parent?.GetType().Name} {_rect} vs " +
-                $"{other.Parent?.GetType().Name} {other._rect}; " +
-                $"overlap: {IsColliding(other)}");
-            
-            if (other != this && IsColliding(other))
+            if (other == this ||other.Parent == null || !other.IsEnabled) continue;
+          other.RefreshBounds();
+          
+            if (IsColliding(other))
                 Notify(other);
         }
         
-        base.Update(gameTime);
+        
+    }
+
+    private void RefreshBounds()
+    {
+        if(Parent ==  null) return;
+        Rectangle parentRect = Parent._rect;
+        if (!UseCustomBounds)
+        {
+            _rect= parentRect;
+            return;
+        }
+
+        int offsetX = LocalBounds.X;
+        bool flipped = (Parent._effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None;
+        if (flipped)
+            offsetX = parentRect.Width - LocalBounds.X - LocalBounds.Width;
+        
+        _rect = new Rectangle(parentRect.X + offsetX, parentRect.Y + LocalBounds.Y, LocalBounds.Width, LocalBounds.Height);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-
-#if DEBUG
+        if(!IsEnabled || !showDebugOutline) return;
+    #if DEBUG
         // draw outline bounds
         int thickness = 5;
-        Color color = Color.Green;
+        Color color = isTrigger? Color.Orange : Color.LawnGreen;
         
         // top
         spriteBatch.Draw(_texture,
@@ -98,6 +128,6 @@ public class Collider : Sprite
                 thickness
             ), 
             color);
-#endif        
+    #endif        
     }
 }

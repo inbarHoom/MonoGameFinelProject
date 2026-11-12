@@ -33,7 +33,10 @@ public class Player : Animation, IDamagable, IHealable
     
     
     public float speed = 500f;
+    // colliders
     public Collider collider { get; set; }
+    private Collider attackCollider;
+    
     private e_PlayerAction _action =  e_PlayerAction.Idle;
     private KeyboardState prevKeyboard;
     // jump
@@ -52,6 +55,8 @@ public class Player : Animation, IDamagable, IHealable
     private bool hasHitTarget;
 
     private readonly Health _health = new Health(100);
+   
+
     public Player() : base(Idle)
     {
         _transform._position = new Vector2(100, 500);
@@ -65,13 +70,32 @@ public class Player : Animation, IDamagable, IHealable
 
     public void CreateCollider()
     {
-        collider = new Collider();
-        collider.Parent = this;
+        // player hitbox
+        collider = new Collider
+        {
+            Parent = this,
+            UseCustomBounds = true,
+            LocalBounds = new Rectangle(100,50,100,135),
+            showDebugOutline = true
+        };
         collider.onCollision += OnBodyCollision;
         SceneManager.Add(collider);
+        
+        // attack hitbox
+        attackCollider = new Collider
+        {
+            Parent = this,
+            isTrigger = true,
+            IsEnabled = false,
+            UseCustomBounds = true,
+            LocalBounds = new Rectangle(200, 50, 80, 140),
+            showDebugOutline = true
+        };
+        attackCollider.onTrigger += OnAttackTrigger;
+        SceneManager.Add(attackCollider);
     }
 
-    private void OnBodyCollision(Collider self, Collider other)
+    private void OnAttackTrigger(Collider self, Collider other)
     {
         bool isAttacking = _action == e_PlayerAction.LightAttack || _action == e_PlayerAction.HeavyAttack;
         if(!isAttacking || hasHitTarget) return;
@@ -82,8 +106,14 @@ public class Player : Animation, IDamagable, IHealable
         }
     }
 
+    private void OnBodyCollision(Collider self, Collider other)
+    {
+    
+    }
+
     public void TakeDamage(int amount)
     {
+        if(_action == e_PlayerAction.Death) return;
         _health.TakeDamage(amount);
         _action = e_PlayerAction.Hit;
         StartPlayerAnimation(Hit,e_PlayerAction.Hit,false,4);
@@ -107,6 +137,12 @@ public class Player : Animation, IDamagable, IHealable
     private void StartPlayerAnimation(string spriteName, e_PlayerAction newAction, bool loops, int framesPerSecond ,double lastFrameHoldSeconds = 0)
     {
         _action = newAction;
+        if (attackCollider != null)
+        {
+            attackCollider.IsEnabled =
+                newAction == e_PlayerAction.LightAttack ||
+                newAction == e_PlayerAction.HeavyAttack;
+        }
         if (newAction == e_PlayerAction.LightAttack)
         {
             currentAttackDamage = lightAttackDamage;

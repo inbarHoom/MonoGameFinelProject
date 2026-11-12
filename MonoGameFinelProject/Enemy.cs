@@ -15,12 +15,20 @@ public  class Enemy : Animation , IDamagable
     protected Health _health;
     protected float speed = 500f;
     protected Collider collider { get; set; }
+    protected Collider attackCollider;
     protected e_EnemyState _state = e_EnemyState.Idle;
+    protected int attack3Damage {get; set; }  
+    protected int attack1Damage {get; set; } 
+    protected int attack2Damage {get; set; } 
+    protected int currentAttackDamage;
+    protected bool hasHitTarget;
+    protected bool targetInRange;
+    
     protected Enemy(string SpriteName, int maxHealth) : base(SpriteName)
     {
         _health = new Health(maxHealth);
     }
-    public void CreateCollider()
+    public virtual void CreateCollider()
     {
         collider = new Collider();
         collider.Parent = this;
@@ -34,6 +42,7 @@ public  class Enemy : Animation , IDamagable
 
     public virtual void TakeDamage(int amount)
     {
+        if(_state == e_EnemyState.Death) return;
         _health.TakeDamage(amount);
         if (_health.Current == 0)
             Die();
@@ -45,6 +54,11 @@ public  class Enemy : Animation , IDamagable
     }
     public override void Update(GameTime gameTime)
     {
+        if (_state == e_EnemyState.Death)
+        {
+            if(!isFinished) base.Update(gameTime);
+            return;
+        }
         base.Update(gameTime);
     }
 }
