@@ -13,6 +13,7 @@ public class Animation : Sprite
     private bool isAnimating = false;
     private int x = 0;
     private int y = 0;
+    public int CurrentFrame => x;
     public Animation(string SpriteName) : base(SpriteName)
     {
     }

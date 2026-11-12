@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,9 +14,10 @@ public class Goblin : Enemy
     private const string Attack3 = "GoblinAttack3";
     private const string Hit = "GoblinHit";
     private const string Death = "GoblinDeath";
-    
+
     public Goblin() : base(Idle, 80)
     {
+        speed = 200f;
         _transform._position = new Vector2(500, 530);
         _transform._rotation = 0;
         _transform._scale = Vector2.One * 1.5f;
@@ -44,15 +44,16 @@ public class Goblin : Enemy
 
     public override void CreateCollider()
     {
-        collider = new Collider
+        bodyCollider = new Collider
         {
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(70, 75, 75, 80),
-            showDebugOutline = true
+            showDebugOutline = true,
+            colliderType = Collider.e_ColliderType.Body
         };
-        SceneManager.Add(collider);
+        SceneManager.Add(bodyCollider);
 
         attackCollider = new Collider
         {
@@ -60,28 +61,25 @@ public class Goblin : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 80, 50, 70),
-            showDebugOutline = true
+            LocalBounds = new Rectangle(145, 80, 10, 70),
+            showDebugOutline = true,
+            colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
         SceneManager.Add(attackCollider);
-    }
 
-    private void OnAttackTrigger(Collider self, Collider other)
-    {
-        if(other.Parent is not Player player) return;
-        targetInRange = true;
-        
-        if(_state == e_EnemyState.Death || _state == e_EnemyState.Hit) return;
-
-        if (_state == e_EnemyState.Idle || _state == e_EnemyState.Run)
-            StartGoblinAttack1();
-
-        if ((_state == e_EnemyState.Attack1 || _state == e_EnemyState.Attack2) && !hasHitTarget)
+        visionCollider = new Collider
         {
-            player.TakeDamage(currentAttackDamage);
-            hasHitTarget = true;
-        }
+            Parent = this,
+            IsEnabled = true,
+            isTrigger = true,
+            UseCustomBounds = true,
+            LocalBounds = new Rectangle(70, 97, 170, 15),
+            showDebugOutline = true,
+            colliderType = Collider.e_ColliderType.Vision
+        };
+        visionCollider.onTrigger += OnVisionTrigger;
+        SceneManager.Add(visionCollider);
     }
 
     private void StartGoblinAttack1()
@@ -98,29 +96,46 @@ public class Goblin : Enemy
         
         StartEnemyAnimation(Attack2,e_EnemyState.Attack2,false,8);
     }
-
-    public override void Update(GameTime gameTime)
+    
+    protected override void OnChaseStarted()
     {
-        base.Update(gameTime);
+        StartEnemyAnimation(Run, e_EnemyState.Run, loops: true, framesPerSecond: 10);
+    }
+
+    protected override void StartIdleAnimation()
+    {
+        StartEnemyAnimation(Idle, e_EnemyState.Idle, loops: true, framesPerSecond: 4);
+    }
+
+    protected override bool UpdateSpecificBehavior(GameTime gameTime, bool playerInAttackRange)
+    {
+        bool attackFrame = (_state == e_EnemyState.Attack1 || _state == e_EnemyState.Attack2) && CurrentFrame >= 4;
+
+        if (attackFrame && playerInAttackRange && !hasHitTarget)
+        {
+            target?.TakeDamage(currentAttackDamage);
+            hasHitTarget = true;
+        }
 
         if (_state == e_EnemyState.Attack1 && isFinished)
         {
-            if (targetInRange)
+            if (playerInAttackRange)
                 StartGoblinAttack2();
             else
-                StartEnemyAnimation(Idle,e_EnemyState.Idle,true,4);
+                StartIdleAnimation();
+            return true;
         }
         else if (_state == e_EnemyState.Attack2 && isFinished)
         {
-            StartEnemyAnimation(Idle,e_EnemyState.Idle,true,4);
+            StartIdleAnimation();
+            return true;
         }
-        else if (_state == e_EnemyState.Hit && isFinished)
+        else if (playerInAttackRange && (_state == e_EnemyState.Idle || _state == e_EnemyState.Run))
         {
-            StartEnemyAnimation(
-                Idle, e_EnemyState.Idle, true, 4);
+            StartGoblinAttack1();
+            return true;
         }
 
-        targetInRange = false;
-    
+        return _state == e_EnemyState.Attack1 || _state == e_EnemyState.Attack2;
     }
 }

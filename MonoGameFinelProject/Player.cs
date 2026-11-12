@@ -34,7 +34,7 @@ public class Player : Animation, IDamagable, IHealable
     
     public float speed = 500f;
     // colliders
-    public Collider collider { get; set; }
+    public Collider bodyCollider { get; set; }
     private Collider attackCollider;
     
     private e_PlayerAction _action =  e_PlayerAction.Idle;
@@ -71,15 +71,16 @@ public class Player : Animation, IDamagable, IHealable
     public void CreateCollider()
     {
         // player hitbox
-        collider = new Collider
+        bodyCollider = new Collider
         {
             Parent = this,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(100,50,100,135),
-            showDebugOutline = true
+            showDebugOutline = true,
+            colliderType = Collider.e_ColliderType.Body
         };
-        collider.onCollision += OnBodyCollision;
-        SceneManager.Add(collider);
+        bodyCollider.onCollision += OnBodyCollision;
+        SceneManager.Add(bodyCollider);
         
         // attack hitbox
         attackCollider = new Collider
@@ -89,7 +90,8 @@ public class Player : Animation, IDamagable, IHealable
             IsEnabled = false,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(200, 50, 80, 140),
-            showDebugOutline = true
+            showDebugOutline = true,
+            colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
         SceneManager.Add(attackCollider);
@@ -97,10 +99,12 @@ public class Player : Animation, IDamagable, IHealable
 
     private void OnAttackTrigger(Collider self, Collider other)
     {
+        if(other.colliderType != Collider.e_ColliderType.Body) return;
         bool isAttacking = _action == e_PlayerAction.LightAttack || _action == e_PlayerAction.HeavyAttack;
         if(!isAttacking || hasHitTarget) return;
         if (other.Parent is Enemy enemy)
         {
+            enemy.TurnTowardAttackerAfterHitIfHitFromBehind(this);
             enemy.TakeDamage(currentAttackDamage);
             hasHitTarget = true;
         }

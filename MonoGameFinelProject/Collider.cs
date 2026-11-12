@@ -4,6 +4,16 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 public class Collider : Sprite
 {
+    public enum e_ColliderType
+    {
+        None,
+        Body,
+        Attack,
+        Vision
+    }
+    
+    public e_ColliderType colliderType = e_ColliderType.None;
+    
      public bool isTrigger { get; set; } = false;
 
      public bool IsEnabled { get; set; } = true;
@@ -87,7 +97,26 @@ public class Collider : Sprite
     #if DEBUG
         // draw outline bounds
         int thickness = 5;
-        Color color = isTrigger? Color.Orange : Color.LawnGreen;
+
+        Color color = default;
+        switch (colliderType)
+        {
+            case e_ColliderType.Body:
+            {
+                 color = Color.LawnGreen;
+                break;
+            }
+            case e_ColliderType.Attack:
+            {
+                 color = Color.Orange;
+                break;
+            }
+            case e_ColliderType.Vision:
+            {
+                 color = Color.DeepSkyBlue;
+                break;
+            }
+        }
         
         // top
         spriteBatch.Draw(_texture,
