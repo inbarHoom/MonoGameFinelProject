@@ -49,7 +49,7 @@ public class Sprite : IDrawable , IUpdatable
     }
     public virtual void Update(GameTime gameTime)
     {
-        
+        _rect = GetDestRectangle(_sourceRectangle);
     }
     protected Rectangle GetDestRectangle(Rectangle rect)
     {

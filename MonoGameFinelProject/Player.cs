@@ -1,13 +1,15 @@
 using System;
 using System.Diagnostics;
-
-namespace MonoGameFinelProject;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+namespace MonoGameFinelProject;
+
+
 public class Player : Animation, IDamagable, IHealable
 {
+    // Animations
     private const string Idle = "MartialHeroIdle";
     private const string Run = "MartialHeroRun";
     private const string lightAttack = "MartialHeroAttack1";
@@ -44,6 +46,10 @@ public class Player : Animation, IDamagable, IHealable
     private bool comboWindowOpen;
     private float comboWindowRemaining;
     private const float ComboWindowSeconds = 0.2f;
+    private const int lightAttackDamage = 10;
+    private const int heavyAttackDamage = 20;
+    private int currentAttackDamage;
+    private bool hasHitTarget;
 
     private readonly Health _health = new Health(100);
     public Player() : base(Idle)
@@ -57,11 +63,30 @@ public class Player : Animation, IDamagable, IHealable
         PlayAnimation(isLooping: true, samples: 10);
     }
 
+    public void CreateCollider()
+    {
+        collider = new Collider();
+        collider.Parent = this;
+        collider.onCollision += OnBodyCollision;
+        SceneManager.Add(collider);
+    }
+
+    private void OnBodyCollision(Collider self, Collider other)
+    {
+        bool isAttacking = _action == e_PlayerAction.LightAttack || _action == e_PlayerAction.HeavyAttack;
+        if(!isAttacking || hasHitTarget) return;
+        if (other.Parent is Enemy enemy)
+        {
+            enemy.TakeDamage(currentAttackDamage);
+            hasHitTarget = true;
+        }
+    }
+
     public void TakeDamage(int amount)
     {
         _health.TakeDamage(amount);
         _action = e_PlayerAction.Hit;
-        StartAnimation(Hit,e_PlayerAction.Hit,false,4);
+        StartPlayerAnimation(Hit,e_PlayerAction.Hit,false,4);
         if (_health.Current <= 0)
             Die();
     }
@@ -69,7 +94,7 @@ public class Player : Animation, IDamagable, IHealable
     public void Die()
     {
         _action = e_PlayerAction.Death;
-        StartAnimation(Death, e_PlayerAction.Death,false,6);
+        StartPlayerAnimation(Death, e_PlayerAction.Death,false,4);
     }
 
     public void Heal(int amount) => _health.Heal(amount);
@@ -79,22 +104,31 @@ public class Player : Animation, IDamagable, IHealable
         return keyboard.IsKeyDown(key) && prevKeyboard.IsKeyUp(key);
     }
 
-    private void StartAnimation(string spriteName, e_PlayerAction newAction, bool loops, int framesPerSecond ,double lastFrameHoldSeconds = 0)
+    private void StartPlayerAnimation(string spriteName, e_PlayerAction newAction, bool loops, int framesPerSecond ,double lastFrameHoldSeconds = 0)
     {
         _action = newAction;
-        ChangeAnimation(spriteName);
-        PlayAnimation(loops,framesPerSecond , lastFrameHoldSeconds);
+        if (newAction == e_PlayerAction.LightAttack)
+        {
+            currentAttackDamage = lightAttackDamage;
+            hasHitTarget = false;
+        }
+        else if (newAction == e_PlayerAction.HeavyAttack)
+        {
+            currentAttackDamage = heavyAttackDamage;
+            hasHitTarget = false;
+        }
+        base.StartAnimation(spriteName, loops, framesPerSecond, lastFrameHoldSeconds);
     }
     private void ShowGroundAnimation(bool moving)
     {
         if (moving)
         {
             if (_action != e_PlayerAction.Run)
-                StartAnimation(Run, e_PlayerAction.Run, loops: true, framesPerSecond: 10);
+                StartPlayerAnimation(Run, e_PlayerAction.Run, loops: true, framesPerSecond: 10);
         }
         else if (_action != e_PlayerAction.Idle)
         {
-            StartAnimation(Idle, e_PlayerAction.Idle, loops: true, framesPerSecond: 10);
+            StartPlayerAnimation(Idle, e_PlayerAction.Idle, loops: true, framesPerSecond: 10);
         }
     }
     
@@ -148,7 +182,7 @@ public class Player : Animation, IDamagable, IHealable
                 if (heavyAtkPressed)
                 {
                     comboWindowOpen = false;
-                    StartAnimation(heavyAttack,e_PlayerAction.HeavyAttack,false,12);
+                    StartPlayerAnimation(heavyAttack,e_PlayerAction.HeavyAttack,false,12);
                 }
                 else
                 {
@@ -188,7 +222,7 @@ public class Player : Animation, IDamagable, IHealable
             // Switch from Jump to Fall as the player starts descending.
             if (verticalVelocity >= 0 && _action == e_PlayerAction.Jump)
             {
-                StartAnimation(Fall, e_PlayerAction.Fall, true, 8);
+                StartPlayerAnimation(Fall, e_PlayerAction.Fall, true, 8);
             }
 
             // Land at the same height from which the jump began.
@@ -206,11 +240,11 @@ public class Player : Animation, IDamagable, IHealable
             groundY = position.Y;
             verticalVelocity = jumpVelocity;
 
-            StartAnimation(Jump, e_PlayerAction.Jump,false, 10);
+            StartPlayerAnimation(Jump, e_PlayerAction.Jump,false, 10);
         }
         else if (lightAtkPressed)
         {
-            StartAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.05);
+            StartPlayerAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.05);
         }
         else
         {

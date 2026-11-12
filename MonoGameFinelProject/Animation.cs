@@ -42,6 +42,12 @@ public class Animation : Sprite
         isAnimating = true;
     }
 
+    protected virtual void StartAnimation(string spriteName, bool loops, int framesPerSecond, double lastFrameHoldSeconds)
+    {
+        ChangeAnimation(spriteName);
+        PlayAnimation(loops, framesPerSecond, lastFrameHoldSeconds);
+    }
+
     public void ChangeAnimation(string newAnimation)
     {
         _spritesheet = SpriteManager.GetSprite(newAnimation);

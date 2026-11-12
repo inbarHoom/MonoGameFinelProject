@@ -39,6 +39,11 @@ public class Collider : Sprite
         {
             Collider other = SceneManager.colliders[i];
             
+            System.Diagnostics.Debug.WriteLine(
+                $"{Parent?.GetType().Name} {_rect} vs " +
+                $"{other.Parent?.GetType().Name} {other._rect}; " +
+                $"overlap: {IsColliding(other)}");
+            
             if (other != this && IsColliding(other))
                 Notify(other);
         }

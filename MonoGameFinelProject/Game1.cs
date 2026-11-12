@@ -38,7 +38,9 @@ public class Game1 : Game
         _spriteManager = new SpriteManager(Content);
         _audioManager = new AudioManager(Content); 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+// Collider
+        SpriteManager.AddSprite("Pixel", "Images/pixel");
+// Player
         SpriteManager.AddSprite("MartialHeroIdle", "SpriteSheets/MartialHero/Idle", 1, 8);
         SpriteManager.AddSprite("MartialHeroRun", "SpriteSheets/MartialHero/Run", 1, 8);
         SpriteManager.AddSprite("MartialHeroAttack1", "SpriteSheets/MartialHero/Attack1", 1, 6);
@@ -47,13 +49,28 @@ public class Game1 : Game
         SpriteManager.AddSprite("MartialHeroFall", "SpriteSheets/MartialHero/Fall", 1, 2);
         SpriteManager.AddSprite("MartialHeroHit", "SpriteSheets/MartialHero/Take Hit - white silhouette", 1, 4);
         SpriteManager.AddSprite("MartialHeroDeath", "SpriteSheets/MartialHero/Death", 1, 6);
-
+// Bomb
+        SpriteManager.AddSprite("Bomb", "SpriteSheets/Goblin/Bomb_sprite", 1, 8);
+// Enemies:
+// Goblin
+        SpriteManager.AddSprite("GoblinIdle", "SpriteSheets/Goblin/Idle", 1, 4);
+        SpriteManager.AddSprite("GoblinRun", "SpriteSheets/Goblin/Run", 1, 8);
+        SpriteManager.AddSprite("GoblinAttack1", "SpriteSheets/Goblin/Attack", 1, 8);
+        SpriteManager.AddSprite("GoblinAttack2", "SpriteSheets/Goblin/Attack2", 1, 8);
+        SpriteManager.AddSprite("GoblinAttack3", "SpriteSheets/Goblin/Attack", 1, 12);
+        SpriteManager.AddSprite("GoblinHit", "SpriteSheets/Goblin/Take Hit", 1, 4);
+        SpriteManager.AddSprite("GoblinDeath", "SpriteSheets/Goblin/Death", 1, 4);
+        
         Init();
     }
 
     void Init()
     {
-        SceneManager.Create<Player>();
+       var player = SceneManager.Create<Player>();
+       var goblin = SceneManager.Create<Goblin>();
+       
+       player.CreateCollider();
+       goblin.CreateCollider();
     }
     
     protected override void Update(GameTime gameTime)
