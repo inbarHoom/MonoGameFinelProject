@@ -8,6 +8,8 @@ public class SceneManager : IUpdatable , IDrawable
     static List <IDrawable> _drawables = new();
     public static List <Collider> colliders = new();
     
+    
+    
     private static SceneManager instance;
     
     public static SceneManager Instance

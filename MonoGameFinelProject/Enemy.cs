@@ -20,6 +20,10 @@ public  class Enemy : Animation , IDamagable
     protected Collider attackCollider;
     protected Collider visionCollider;
 
+    protected bool isGrounded;
+    protected float verticalVelocity;
+    protected const float Gravity = 1800f;
+    
     protected e_EnemyState _state = e_EnemyState.Idle;
     protected int attack3Damage {get; set; }  
     protected int attack1Damage {get; set; } 
@@ -40,6 +44,7 @@ public  class Enemy : Animation , IDamagable
         bodyCollider = new Collider();
         bodyCollider.Parent = this;
         SceneManager.Add(bodyCollider);
+        bodyCollider.onCollision += OnGroundCollision;
     }
     protected virtual void StartEnemyAnimation(string spriteName, e_EnemyState newState, bool loops, int framesPerSecond, double lastFrameHoldSeconds = 0)
     {
@@ -59,6 +64,19 @@ public  class Enemy : Animation , IDamagable
     {
         
     }
+    
+    protected void OnGroundCollision(Collider self, Collider other)
+    {
+        if (other.colliderType != Collider.e_ColliderType.Ground) return;
+        if (verticalVelocity < 0) return; // Ignore the floor while moving up.
+
+        Vector2 position = _transform._position;
+        position.Y = other._rect.Top - self.LocalBounds.Bottom;
+        _transform._position = position;
+
+        verticalVelocity = 0;
+        isGrounded = true;
+    }
 
     public void FaceTarget(Player player)
     {
@@ -69,15 +87,14 @@ public  class Enemy : Animation , IDamagable
             : SpriteEffects.None;
     }
 
-    public void TurnTowardAttackerAfterHitIfHitFromBehind(Player player)
+    public void TurnTowardAttackerAfterHitFromBehind(Player player)
     {
         turnTargetAfterHit = null;
         if (player == null) return;
 
         bool enemyFacingLeft = (_effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None;
         bool playerIsLeft = player._transform._position.X < _transform._position.X;
-
-        // The player is behind when their side differs from the direction the enemy faces.
+        
         if (playerIsLeft != enemyFacingLeft)
             turnTargetAfterHit = player;
     }
@@ -116,7 +133,6 @@ public  class Enemy : Animation , IDamagable
             OnChaseStarted();
     }
 
-    // Each enemy supplies its own run animation when shared chase logic starts moving it.
     protected virtual void OnChaseStarted()
     {
     }
@@ -125,7 +141,6 @@ public  class Enemy : Animation , IDamagable
     {
     }
 
-    // Return true when the enemy-specific behavior handled this update.
     protected virtual bool UpdateSpecificBehavior(GameTime gameTime, bool playerInAttackRange)
     {
         return false;
@@ -138,6 +153,17 @@ public  class Enemy : Animation , IDamagable
         targetInView = false;
         targetInRange = false;
 
+        if (!isGrounded)
+        {
+            float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            verticalVelocity += Gravity * deltaSeconds;
+
+            Vector2 position = _transform._position;
+            position.Y += verticalVelocity * deltaSeconds;
+            _transform._position = position;
+        }
+        
         if (_state == e_EnemyState.Death)
         {
             if(!isFinished) base.Update(gameTime);

@@ -34,14 +34,15 @@ public class Player : Animation, IDamagable, IHealable
     
     public float speed = 500f;
     // colliders
-    public Collider bodyCollider { get; set; }
+    private Collider bodyCollider;
+    private Collider feetCollider;
     private Collider attackCollider;
     
     private e_PlayerAction _action =  e_PlayerAction.Idle;
     private KeyboardState prevKeyboard;
     // jump
-    private bool isAirborne;
-    private float groundY;
+    private bool isAirborne = true;
+  //  private float groundY;
     private float verticalVelocity;
     private const float gravity = 1800f;
     private const float jumpVelocity = -800f;
@@ -55,7 +56,8 @@ public class Player : Animation, IDamagable, IHealable
     private bool hasHitTarget;
 
     private readonly Health _health = new Health(100);
-   
+    private int parryHitFrame = 3;
+
 
     public Player() : base(Idle)
     {
@@ -76,7 +78,7 @@ public class Player : Animation, IDamagable, IHealable
             Parent = this,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(100,50,100,135),
-            showDebugOutline = true,
+            showDebugOutline = false,
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnBodyCollision;
@@ -90,34 +92,60 @@ public class Player : Animation, IDamagable, IHealable
             IsEnabled = false,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(200, 50, 80, 140),
-            showDebugOutline = true,
+            showDebugOutline = false,
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
         SceneManager.Add(attackCollider);
+        
     }
 
     private void OnAttackTrigger(Collider self, Collider other)
     {
-        if(other.colliderType != Collider.e_ColliderType.Body) return;
+        if (_action == e_PlayerAction.HeavyAttack && CurrentFrame >= parryHitFrame && other.Parent is Bomb bomb)
+        {
+            if (bomb.TryParry(this))
+                hasHitTarget = true;
+
+            return;
+        }
         bool isAttacking = _action == e_PlayerAction.LightAttack || _action == e_PlayerAction.HeavyAttack;
         if(!isAttacking || hasHitTarget) return;
+        
         if (other.Parent is Enemy enemy)
         {
-            enemy.TurnTowardAttackerAfterHitIfHitFromBehind(this);
+            if(other.colliderType != Collider.e_ColliderType.Body) return;
+            enemy.TurnTowardAttackerAfterHitFromBehind(this);
             enemy.TakeDamage(currentAttackDamage);
             hasHitTarget = true;
         }
+       
     }
 
     private void OnBodyCollision(Collider self, Collider other)
     {
-    
+        if (other.colliderType != Collider.e_ColliderType.Ground) return;
+        if (verticalVelocity < 0) return; 
+
+        Vector2 position = _transform._position;
+        position.Y = other._rect.Top - self.LocalBounds.Bottom;
+        _transform._position = position;
+
+        verticalVelocity = 0;
+        isAirborne = false;
     }
 
     public void TakeDamage(int amount)
     {
         if(_action == e_PlayerAction.Death) return;
+        if (isAirborne)
+        {
+          //  Vector2 position = _transform._position;
+          //  position.Y = groundY;
+          //  _transform._position = position;
+          //  isAirborne = false;
+            verticalVelocity = 0;
+        }
         _health.TakeDamage(amount);
         _action = e_PlayerAction.Hit;
         StartPlayerAnimation(Hit,e_PlayerAction.Hit,false,4);
@@ -197,19 +225,35 @@ public class Player : Animation, IDamagable, IHealable
             _effects = SpriteEffects.None;
 
         bool moving = horizontal != 0;
+        
+        if (isAirborne)
+        {
+            verticalVelocity += gravity * deltaSeconds;
+            position.Y += verticalVelocity * deltaSeconds;
 
+            if (verticalVelocity >= 0 && _action == e_PlayerAction.Jump)
+                StartPlayerAnimation(Fall, e_PlayerAction.Fall, true, 8);
+        }
+        
         if (_action == e_PlayerAction.Hit)
         {
             if (isFinished)
-                ShowGroundAnimation(moving);
+                if (isAirborne)
+                {
+                    StartPlayerAnimation(Fall, e_PlayerAction.Fall, true, 8);
+                }
+                else
+                {
+                    ShowGroundAnimation(moving);    
+                }
+                
         }
         else if (_action == e_PlayerAction.Death)
         {
             if (isFinished)
                 Game1.GameOver = true;
         }
-        // An attack keeps playing even after its key is released.
-       else  if (_action == e_PlayerAction.LightAttack)
+        else  if (_action == e_PlayerAction.LightAttack)
         {
             if (isFinished && !comboWindowOpen)
             {
@@ -234,19 +278,6 @@ public class Player : Animation, IDamagable, IHealable
                     }
                 }
             }
-            /*
-            if (isFinished)
-            {
-                if (heavyAtkPressed)
-                {
-                    StartAnimation(heavyAttack, e_PlayerAction.HeavyAttack,  false,  12);
-                }
-                else if (!isAirborne)
-                {
-                    ShowGroundAnimation(moving);
-                }
-            }
-            */
         }
         else if (_action == e_PlayerAction.HeavyAttack)
         {
@@ -256,28 +287,12 @@ public class Player : Animation, IDamagable, IHealable
     
         else if (isAirborne)
         {
-            verticalVelocity += gravity * deltaSeconds;
-            position.Y += verticalVelocity * deltaSeconds;
-
-            // Switch from Jump to Fall as the player starts descending.
-            if (verticalVelocity >= 0 && _action == e_PlayerAction.Jump)
-            {
-                StartPlayerAnimation(Fall, e_PlayerAction.Fall, true, 8);
-            }
-
-            // Land at the same height from which the jump began.
-            if (position.Y >= groundY && verticalVelocity > 0)
-            {
-                position.Y = groundY;
-                verticalVelocity = 0;
-                isAirborne = false;
-                ShowGroundAnimation(moving);
-            }
+            // Gravity and the Fall animation were handled earlier in Update.
+            // This prevents the grounded actions below from running in midair.
         }
         else if (jumpPressed)
         {
             isAirborne = true;
-            groundY = position.Y;
             verticalVelocity = jumpVelocity;
 
             StartPlayerAnimation(Jump, e_PlayerAction.Jump,false, 10);
@@ -296,66 +311,4 @@ public class Player : Animation, IDamagable, IHealable
         base.Update(gameTime);
         prevKeyboard = keyboard;
     }
-/*
-    private void SetAnimation(string animationName, bool loops, int framesPerSecond)
-    {
-        if (currentAnimation == animationName)
-            return;
-
-        currentAnimation = animationName;
-        ChangeAnimation(animationName);
-        PlayAnimation(loops, framesPerSecond);
-    }
-
-    public override void Update(GameTime gameTime)
-    {
-        var keyboard = Keyboard.GetState();
-        bool lightAtkPressed = keyboard.IsKeyDown(Keys.J) && !prevKeyboard.IsKeyUp(Keys.J);
-        bool heavyAtkPressed = keyboard.IsKeyDown(Keys.K) && !prevKeyboard.IsKeyUp(Keys.K);
-        float distance = (float)gameTime.ElapsedGameTime.TotalMilliseconds * speed;
-        bool moving = false;
-        Vector2 position = _transform._position;
-
-        if (keyboard.IsKeyDown(Keys.D))
-        {
-            position.X += distance;
-            _effects = SpriteEffects.None;
-            moving = true;
-        }
-        if (keyboard.IsKeyDown(Keys.A))
-        {
-            position.X -= distance;
-            _effects = SpriteEffects.FlipHorizontally;
-            moving = true;
-        }
-        if (keyboard.IsKeyDown(Keys.W))
-        {
-            position.Y -= distance;
-            moving = true;
-        }
-        if (keyboard.IsKeyDown(Keys.S))
-        {
-            position.Y += distance;
-            moving = true;
-        }
-
-        if (lightAtkPressed)
-            SetAnimation(lightAttack, loops: false, framesPerSecond: 12);
-        else if (heavyAtkPressed)
-            SetAnimation(heavyAttack, loops: false, framesPerSecond: 12);
-        else if (keyboard.IsKeyDown(Keys.Space))
-        {
-            
-            SetAnimation(Jump, loops: false, framesPerSecond: 10);
-        }
-        else if (moving)
-            SetAnimation(Run, loops: true, framesPerSecond: 10);
-        else
-            SetAnimation(Idle, loops: true, framesPerSecond: 10);
-
-        _transform._position = position;
-        prevKeyboard = keyboard;
-        base.Update(gameTime);
-    }
-    */
 }

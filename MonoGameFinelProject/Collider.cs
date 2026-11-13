@@ -9,7 +9,8 @@ public class Collider : Sprite
         None,
         Body,
         Attack,
-        Vision
+        Vision,
+        Ground
     }
     
     public e_ColliderType colliderType = e_ColliderType.None;
@@ -116,6 +117,9 @@ public class Collider : Sprite
                  color = Color.DeepSkyBlue;
                 break;
             }
+            case e_ColliderType.Ground:
+                color = Color.SaddleBrown;
+                break;
         }
         
         // top

@@ -50,14 +50,14 @@ public class Game1 : Game
         SpriteManager.AddSprite("MartialHeroHit", "SpriteSheets/MartialHero/Take Hit - white silhouette", 1, 4);
         SpriteManager.AddSprite("MartialHeroDeath", "SpriteSheets/MartialHero/Death", 1, 6);
 // Bomb
-        SpriteManager.AddSprite("Bomb", "SpriteSheets/Goblin/Bomb_sprite", 1, 8);
+        SpriteManager.AddSprite("Bomb", "SpriteSheets/Goblin/Bomb_sprite", 1, 19);
 // Enemies:
 // Goblin
         SpriteManager.AddSprite("GoblinIdle", "SpriteSheets/Goblin/Idle", 1, 4);
         SpriteManager.AddSprite("GoblinRun", "SpriteSheets/Goblin/Run", 1, 8);
         SpriteManager.AddSprite("GoblinAttack1", "SpriteSheets/Goblin/Attack", 1, 8);
         SpriteManager.AddSprite("GoblinAttack2", "SpriteSheets/Goblin/Attack2", 1, 8);
-        SpriteManager.AddSprite("GoblinAttack3", "SpriteSheets/Goblin/Attack", 1, 12);
+        SpriteManager.AddSprite("GoblinAttack3", "SpriteSheets/Goblin/Attack3", 1, 12);
         SpriteManager.AddSprite("GoblinHit", "SpriteSheets/Goblin/Take Hit", 1, 4);
         SpriteManager.AddSprite("GoblinDeath", "SpriteSheets/Goblin/Death", 1, 4);
         
@@ -66,11 +66,26 @@ public class Game1 : Game
 
     void Init()
     {
+        var floor = new Sprite("Pixel");
+        floor._transform._position = new Vector2(0, 900);
+        floor._transform._scale = new Vector2(ScreenSize.X, 20);
+        floor._color = Color.Yellow;
+        SceneManager.Add(floor);
+
+        var floorCollider = new Collider
+        {
+            Parent = floor,
+            colliderType = Collider.e_ColliderType.Ground,
+            showDebugOutline = true
+        };
+        SceneManager.Add(floorCollider);
+        
        var player = SceneManager.Create<Player>();
        var goblin = SceneManager.Create<Goblin>();
        
        player.CreateCollider();
-       goblin.CreateCollider();
+       goblin.CreateCollider(); 
+     
     }
     
     protected override void Update(GameTime gameTime)
