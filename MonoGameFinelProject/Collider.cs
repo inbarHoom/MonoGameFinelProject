@@ -25,15 +25,18 @@ public class Collider : Sprite
      public Rectangle LocalBounds { get; set; }
      
      public bool showDebugOutline { get; set; }
+     private static bool debugOutlinesVisible = false;
      
     public Action<Collider, Collider> onTrigger;
     public Action<Collider, Collider> onCollision;
 
-    public Sprite Parent { get; set; } 
-    
+    public Sprite Parent { get; set; }
+
 
     public Collider() : base("Pixel")
-    { }
+    {
+        
+    }
 
     public bool IsColliding(Collider otherCollider)
     {
@@ -47,22 +50,23 @@ public class Collider : Sprite
         else
             onCollision?.Invoke(this, other);
     }
+
+    public static void ToggleDebugOutlines()
+    {
+        debugOutlinesVisible = !debugOutlinesVisible;
+
+        foreach (Collider collider in SceneManager.colliders)
+        {
+            collider.showDebugOutline = debugOutlinesVisible;
+        }
+    }
     
     public override void Update(GameTime gameTime)
     {
-        if (Keyboard.GetState().IsKeyDown(Keys.Z))
-            TurnOffCollider();
         if (Parent == null || !IsEnabled) return;
         base.Update(gameTime);
         RefreshBounds();
-        /*
-        if(!UseCustomBounds)
-            _rect = Parent._rect;
-        else
-        {
-            _rect = LocalBounds;
-        }
-        */
+       
         // go on all colliders and check if intersect with them
         // while ignore self
         for (int i = 0; i < SceneManager.colliders.Count; i++)

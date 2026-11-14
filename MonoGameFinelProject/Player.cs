@@ -320,6 +320,10 @@ public class Player : Animation, IDamagable, IHealable
         {
             TryInteract();
         }
+        if (WasPressed(keyboard, Keys.Z))
+        {
+            Collider.ToggleDebugOutlines();
+        }
 
         if (WasPressed(keyboard, Keys.F))
         {
