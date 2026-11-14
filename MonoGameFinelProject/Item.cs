@@ -4,17 +4,21 @@ public class Item : Sprite , IPickupable , ISellable
 {
     public enum e_ItemType
     {
+        None,
         Coin,
         Misc,
         Weapon,
         Potion
     }
-    private string itemName { get; set; }
-    private string itemDescription { get; set; }
-    private e_ItemType itemType { get; set; }
-    private bool isSellable { get; set; }
-    private int itemPrice { get; set; }
+
+    private string ItemName => ItemName; 
+    private string ItemDescription => ItemDescription;
+    private Sprite itemSprite;
+    private e_ItemType ItemType => e_ItemType.None;
+    private bool IsSellable => IsSellable;
+    private int itemPrice => itemPrice;
     private int itemQuantity { get; set; }
+    private string ItemID {get;set;}
 
     protected Item(string SpritenName) : base(SpritenName)
     {

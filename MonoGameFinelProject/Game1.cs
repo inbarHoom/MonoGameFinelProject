@@ -85,6 +85,17 @@ public class Game1 : Game
         SpriteManager.AddSprite("GoblinAttack3", "SpriteSheets/Goblin/Attack3", 1, 12);
         SpriteManager.AddSprite("GoblinHit", "SpriteSheets/Goblin/Take Hit", 1, 4);
         SpriteManager.AddSprite("GoblinDeath", "SpriteSheets/Goblin/Death", 1, 4);
+// Mimic
+        SpriteManager.AddSprite("ChestClosed", "SpriteSheets/Mimic/idle_closed");
+        SpriteManager.AddSprite("ChestOpen", "SpriteSheets/Mimic/idle_open");
+        SpriteManager.AddSprite("ChestOpening", "SpriteSheets/Mimic/opening",1,6);
+        SpriteManager.AddSprite("MimicAttack1", "SpriteSheets/Mimic/attack_1" ,1,14);
+        SpriteManager.AddSprite("MimicAttack2", "SpriteSheets/Mimic/attack_2" ,1,13);
+        SpriteManager.AddSprite("MimicDeath", "SpriteSheets/Mimic/death" ,1,6);
+        SpriteManager.AddSprite("MimicHurt", "SpriteSheets/Mimic/hurt",1,3);
+        SpriteManager.AddSprite("MimicIdle", "SpriteSheets/Mimic/idle_transformed",1,9);
+        SpriteManager.AddSprite("MimicTransform", "SpriteSheets/Mimic/transform",1,7);
+        SpriteManager.AddSprite("MimicWalk", "SpriteSheets/Mimic/walk",1,6);
         
         Init();
     }

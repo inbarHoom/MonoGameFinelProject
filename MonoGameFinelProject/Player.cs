@@ -69,6 +69,10 @@ public class Player : Animation, IDamagable, IHealable
     public float CurrentStamina { get; private set; } = StaminaCapacity;
     public float MaxStamina => StaminaCapacity;
     private float staminaRegenTimer;
+    // inventory
+    private readonly PlayerInventory _inventory = new();
+
+    public PlayerInventory Inventory => _inventory;
 
 
     public Player() : base(Idle)
