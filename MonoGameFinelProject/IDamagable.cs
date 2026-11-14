@@ -18,3 +18,7 @@ public interface IThrowable
 {
     void Throw(Sprite thrower,Vector2 startPos, Vector2 targetPos, int damage);
 }
+public interface ISellable
+{
+    void Sell(Item item);
+}
