@@ -55,6 +55,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("PickupIcon", "UI/Icon3");
         
         SpriteManager.AddSprite("KeyboardABC", "UI/kb_dark_alphanumeric");
+        SpriteManager.AddSprite("KeyboardSymbols", "UI/kb_dark_symbols");
 // Items
         SpriteManager.AddSprite("ItemsSheet", "SpriteSheets/Items/items 32x32");
         SpriteManager.AddSprite("GoblinToe", "SpriteSheets/Items/Icon2");
@@ -183,7 +184,7 @@ public class Game1 : Game
        float iconSize = 256 * iconScale;       
         float slotSize = 32 * itemSlotScale;
         const float attackSlotGap = 20f;
-        const float rightMargin = 50f;
+        const float rightMargin = 80f;
 
         float slotY = ScreenSize.Y - slotSize - bottomMargin;
         float leftSlotX = leftMargin; // light attack back
@@ -242,17 +243,6 @@ public class Game1 : Game
        float keyScale = 4f;
        Vector2 keyOffset = new Vector2(-30, -30);
        
-      // float keyInsetX = 13 * itemSlotScale;
-     //  float keyInsetY = 5f;
-
-       // Vector2 pickupKeyPosition = new Vector2(
-       //     pickupSlotX + keyInsetX + keyInsetY,
-       //     slotY + keyInsetY);
-       //
-       // Vector2 inventoryKeyPosition = new Vector2(
-       //     inventorySlotX + keyInsetX + keyInsetY,
-       //     slotY + keyInsetY);
-       
        Vector2 pickupSlotPosition = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
        Vector2 inventorySlotPosition = new Vector2( inventorySlotX + (slotWidth - iconSize) / 2,
@@ -294,6 +284,18 @@ public class Game1 : Game
            new Rectangle(16, 80, 16, 16), // F held
            inventorySlotPosition + keyOffset,
            keyScale));
+       SceneManager.Add(new KeyboardPrompt( 1,
+           Keys.OemComma,
+           new Rectangle(0, 270, 16, 16), // < released
+           new Rectangle(16, 270, 16, 16),  // < pressed
+           new Vector2(inventorySlot._transform._position.X + keyOffset.X - 25,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
+           ,keyScale)); 
+       SceneManager.Add(new KeyboardPrompt( 1,
+           Keys.OemPeriod,
+           new Rectangle(0, 254, 16, 16), // < released
+           new Rectangle(16, 254, 16, 16),  // < pressed
+           new Vector2(inventorySlot._transform._position.X - keyOffset.X + 60,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
+           ,keyScale)); 
     }
     
     protected override void Update(GameTime gameTime)

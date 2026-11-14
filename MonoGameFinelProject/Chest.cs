@@ -14,7 +14,7 @@ public class Chest : Animation
         WaitingForMimicDeath,
         Opened
     }
-    private const double MimicChance = 0.2;
+    private const double MimicChance = 0.5;
     private e_ChestState _state = e_ChestState.Closed;
     private bool _lootSpawned;
     private Collider interactCollider;
@@ -64,6 +64,9 @@ public class Chest : Animation
     public void Open()
     {
         if(_state !=  e_ChestState.Closed) return;
+        if (interactCollider != null)
+            interactCollider.IsEnabled = false;
+        PlayerInRange = false;
         if (Random.Shared.NextDouble() < MimicChance)
         {
             SpawnMimic();

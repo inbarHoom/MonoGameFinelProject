@@ -75,7 +75,7 @@ public class Player : Animation, IDamagable, IHealable
     public PlayerInventory Inventory => _inventory;
     // key prompt
     private KeyboardPrompt comboKPrompt;
-    public string DisplayedInventoryItemId { get; private set; }
+    public string DisplayedInventoryItemId { get;  set; }
     public event Action<Item> ItemPickedUp;
 
     public event Action<int> InventoryCycled;
@@ -185,6 +185,41 @@ public class Player : Animation, IDamagable, IHealable
         _action = e_PlayerAction.Death;
         StartPlayerAnimation(Death, e_PlayerAction.Death,false,4);
     }
+    private void TryUseEquippedItem()
+    {
+        if (DisplayedInventoryItemId != "Bomb_Pickup")
+            return;
+
+        if (_inventory.TryRemoveItem("Bomb_Pickup", 1))
+        {
+            ThrowBomb();
+        }
+    }
+    private void ThrowBomb()
+    {
+        Collider ground = SceneManager.colliders.Find(collider => collider.colliderType == Collider.e_ColliderType.Ground);
+        if (ground == null) return;
+
+        bool facingLeft = (_effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None;
+
+        // Spawn position near the player's hand/chest based on facing direction
+        float handOffsetX = facingLeft ? 80f : 190f;
+        float handOffsetY = 90f;
+        Vector2 handPos = _transform._position + new Vector2(handOffsetX, handOffsetY);
+        Vector2 bombStart = handPos - new Vector2(50f, 50f);
+
+        Bomb bomb = SceneManager.Create<Bomb>();
+
+        // Aim 320 pixels in front of the player in the direction they are facing
+        float throwDistance = 320f;
+        float targetX = bombStart.X + (facingLeft ? -throwDistance : throwDistance);
+        Vector2 bombTarget = new Vector2(
+            targetX,
+            ground._rect.Top - bomb.GroundContactOffset);
+
+        BombPickUp bombData = new BombPickUp();
+        bomb.Throw(this, bombStart, bombTarget, bombData.damage);
+    }
 
     public void Heal(int amount) => _health.Heal(amount);
 
@@ -284,6 +319,11 @@ public class Player : Animation, IDamagable, IHealable
         if (WasPressed(keyboard, Keys.E))
         {
             TryInteract();
+        }
+
+        if (WasPressed(keyboard, Keys.F))
+        {
+            TryUseEquippedItem();
         }
         if (WasPressed(keyboard, Keys.OemComma) || WasPressed(keyboard, Keys.Left))
         {

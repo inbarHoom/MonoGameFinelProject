@@ -33,6 +33,24 @@ public class KeyboardPrompt : Sprite
         _transform._scale = new Vector2(scale);
         _sourceRectangle = releasedSource;
     }
+    public KeyboardPrompt(int x,
+        Keys key,
+        Rectangle releasedSource,
+        Rectangle heldSource,
+        Vector2 position,
+        float scale,
+        bool autoFlicker = false)
+        : base("KeyboardSymbols")
+    {
+        this.key = key;
+        this.releasedSource = releasedSource;
+        this.heldSource = heldSource;
+        this.AutoFlicker = autoFlicker;
+        _transform._position = position;
+        _transform._scale = new Vector2(scale);
+        _sourceRectangle = releasedSource;
+    }
+    
 
     public override void Update(GameTime gameTime)
     {

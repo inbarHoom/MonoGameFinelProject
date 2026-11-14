@@ -71,6 +71,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
             selectedIndex = -1;
             itemIcon = null;
             currentItemId = null;
+            player.DisplayedInventoryItemId =  null;
             return;
         }
         selectedIndex = (selectedIndex + direction) % itemIdsInOrder.Count;
@@ -92,7 +93,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
     private void RefreshDisplayedItem(string itemId)
     {
         currentItemId = itemId;
-
+        player.DisplayedInventoryItemId = itemId;
         Item template = ItemFactory.Create(itemId);
         currentItemPrice = template.ItemPrice;
 
@@ -112,6 +113,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
         {
             itemIcon = null;
             currentItemId = null;
+            player.DisplayedInventoryItemId =  null;
             selectedIndex = -1;
             return;
         }

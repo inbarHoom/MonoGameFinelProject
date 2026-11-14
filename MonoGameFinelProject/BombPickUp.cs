@@ -2,7 +2,7 @@ namespace MonoGameFinelProject;
 
 public class BombPickUp : Item
 {
-    private int damage;
+    public int damage { get; private set; }
     public BombPickUp() : base("BombPickup" )
     {
         ItemName = "Bomb";
