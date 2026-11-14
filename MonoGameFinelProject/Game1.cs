@@ -22,6 +22,7 @@ public class Game1 : Game
 
         ScreenSize.X = _graphics.PreferredBackBufferWidth;
         ScreenSize.Y = _graphics.PreferredBackBufferHeight;
+        _graphics.IsFullScreen = true;
     }
 
     public static bool GameOver { get; set; }
@@ -48,6 +49,8 @@ public class Game1 : Game
         SpriteManager.AddSprite("StaminaBar", "UI/ui_bar6");
         SpriteManager.AddSprite("BarUI", "UI/ui_front_border5");
         SpriteManager.AddSprite("ItemSlot", "UI/ui_select_item3");
+        
+        SpriteManager.AddSprite("KeyboardABC", "UI/kb_dark_alphanumeric");
 // Items
         SpriteManager.AddSprite("ItemsSheet", "SpriteSheets/Items/items 32x32");
 // Collider
@@ -117,6 +120,67 @@ public class Game1 : Game
        SceneManager.Add(staminaBackground);
 
        SceneManager.Add(new PlayerStaminaBar(player, new Vector2(uiX, uiY), uiScale));
+       
+       const float itemSlotScale = 3f;
+       const float iconScale = 0.3f;
+       const int bottomMargin = 24;
+       const int leftMargin = 35;
+       const int slotGap = 25;
+
+       float slotWidth = 32 * itemSlotScale;   
+       float slotHeight = 32 * itemSlotScale;
+       float iconSize = 256 * iconScale;       
+
+       float slotY = ScreenSize.Y - slotHeight - bottomMargin;
+       float leftSlotX = leftMargin;
+       float rightSlotX = leftSlotX + slotWidth + slotGap;
+
+
+       var leftSlot = new Sprite("ItemSlot");
+       leftSlot._transform._position = new Vector2(leftSlotX, slotY);
+       leftSlot._transform._scale = new Vector2(itemSlotScale);
+       SceneManager.Add(leftSlot);
+
+       var rightSlot = new Sprite("ItemSlot");
+       rightSlot._transform._position = new Vector2(rightSlotX, slotY);
+       rightSlot._transform._scale = new Vector2(itemSlotScale);
+       SceneManager.Add(rightSlot);
+
+
+       var lightIcon = new Sprite("LightAttackUI");
+       lightIcon._transform._position= new Vector2(leftSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
+       lightIcon._transform._scale = new Vector2(iconScale);
+       SceneManager.Add(lightIcon);
+
+       var heavyIcon = new Sprite("HeavyAttackUI");
+       heavyIcon._transform._position = new Vector2(rightSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
+       heavyIcon._transform._scale = new Vector2(iconScale);
+       SceneManager.Add(heavyIcon);
+       
+       Vector2 lightIconPosition = new Vector2(
+           leftSlotX + (slotWidth - iconSize) / 2,
+           slotY + (slotHeight - iconSize) / 2);
+
+       Vector2 heavyIconPosition = new Vector2(
+           rightSlotX + (slotWidth - iconSize) / 2,
+           slotY + (slotHeight - iconSize) / 2);
+       
+       float keyScale = 4f;
+       Vector2 keyOffset = new Vector2(-30, -30);
+
+       SceneManager.Add(new KeyboardPrompt(
+           Keys.J,
+           new Rectangle(0, 144, 16, 16), // J released
+           new Rectangle(16, 144, 16, 16), // J held
+           lightIconPosition + keyOffset,
+           keyScale));
+
+       SceneManager.Add(new KeyboardPrompt(
+           Keys.K,
+           new Rectangle(0, 160, 16, 16), // K released
+           new Rectangle(16, 160, 16, 16), // K held
+           heavyIconPosition + keyOffset,
+           keyScale));
     }
     
     protected override void Update(GameTime gameTime)
