@@ -16,6 +16,11 @@ public class Game1 : Game
 
     private Dictionary<Vector2, int> testMap;
     
+    private Dictionary<Vector2, int> level_1;
+
+
+
+    
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -76,7 +81,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("Map","SpriteSheets/Enviroment/Enviroment",43,57);
         
 //Map
-        testMap = LoadMap("Content/MapSheets/test level.csv");
+        level_1= LoadMap("Content/MapSheets/level 8.csv");
 
 // Collider
         SpriteManager.AddSprite("Pixel", "Images/pixel");
@@ -131,26 +136,27 @@ public class Game1 : Game
         int display_tilesize = 64;
         int num_tiles_per_row = 57;
         int pixel_tilesize = 16;
+        
+            foreach (var tile in level_1)
+            {
+                Rectangle dest = new(
+                    (int)(tile.Key.X * display_tilesize),
+                    (int)(tile.Key.Y * display_tilesize),
+                    display_tilesize,
+                    display_tilesize);
 
-        foreach (var tile in testMap)
-        {
-            Rectangle dest = new(
-                (int)(tile.Key.X * display_tilesize),
-                (int)(tile.Key.Y * display_tilesize),
-                display_tilesize,
-                display_tilesize);
-            
-            int x = tile.Value %  num_tiles_per_row;
-            int y = tile.Value /  num_tiles_per_row;
-            
-            Rectangle src = new(
-                x * pixel_tilesize,
-                y * pixel_tilesize,
-                pixel_tilesize,
-                pixel_tilesize);
-            
-            _spriteBatch.Draw(SpriteManager.GetSprite("Map").texture, dest, src, Color.White);
-        }
+                int x = tile.Value % num_tiles_per_row;
+                int y = tile.Value / num_tiles_per_row;
+
+                Rectangle src = new(
+                    x * pixel_tilesize,
+                    y * pixel_tilesize,
+                    pixel_tilesize,
+                    pixel_tilesize);
+
+                _spriteBatch.Draw(SpriteManager.GetSprite("Map").texture, dest, src, Color.White);
+            }
+        
 
         SceneManager.Instance.Draw(_spriteBatch);
         
