@@ -12,7 +12,7 @@ public class Chest : Animation
         WaitingForMimicDeath,
         Opened
     }
-    private const double MimicChance = 0.2;
+    private const double MimicChance = 0.6;
     private e_ChestState _state = e_ChestState.Closed;
     private bool _lootSpawned;
     private Collider interactCollider;
@@ -106,7 +106,7 @@ public class Chest : Animation
         for (int i = 0; i < itemIds.Length; i++)
         {
             Item item = ItemFactory.Create(itemIds[i]);
-            item._transform._position = _transform._position + new Vector2(i * 40, 0);
+            item._transform._position = _transform._position + new Vector2(145 + i * 50, 175);
             item.CreateCollider();
             SceneManager.Add(item);
         }

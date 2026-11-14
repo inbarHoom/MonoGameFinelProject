@@ -18,6 +18,7 @@ public class Mimic : Enemy
 
     public Mimic() : base("MimicIdle", 80)
     {
+        _transform._scale = Vector2.One;
         speed = 180f;
         _transform._scale = Vector2.One * 2.5f;
         attack1Damage = 12;
@@ -31,7 +32,7 @@ public class Mimic : Enemy
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(10, 10, 80, 80), 
+            LocalBounds = new Rectangle(145, 140, 80, 65),
             showDebugOutline = true,
             colliderType = Collider.e_ColliderType.Body
         };
@@ -43,7 +44,7 @@ public class Mimic : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(90, 10, 40, 80),
+            LocalBounds = new Rectangle(225, 140, 45, 65),
             showDebugOutline = true,
             colliderType = Collider.e_ColliderType.Attack
         };
@@ -55,7 +56,7 @@ public class Mimic : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(-150, 10, 400, 80),
+            LocalBounds = new Rectangle(145, 150, 220, 40),
             showDebugOutline = true,
             colliderType = Collider.e_ColliderType.Vision
         };
