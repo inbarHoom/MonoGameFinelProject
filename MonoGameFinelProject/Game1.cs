@@ -38,6 +38,18 @@ public class Game1 : Game
         _spriteManager = new SpriteManager(Content);
         _audioManager = new AudioManager(Content); 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+// UI
+    //Abilities
+        SpriteManager.AddSprite("LightAttackUI", "UI/Abilities/4");
+        SpriteManager.AddSprite("HeavyAttackUI", "UI/Abilities/5"); 
+    //Hud
+        SpriteManager.AddSprite("BackgroundBar", "UI/ui_bar5");
+        SpriteManager.AddSprite("HealthBar", "UI/ui_bar2");
+        SpriteManager.AddSprite("StaminaBar", "UI/ui_bar6");
+        SpriteManager.AddSprite("BarUI", "UI/ui_front_border5");
+        SpriteManager.AddSprite("ItemSlot", "UI/ui_select_item3");
+// Items
+        SpriteManager.AddSprite("ItemsSheet", "SpriteSheets/Items/items 32x32");
 // Collider
         SpriteManager.AddSprite("Pixel", "Images/pixel");
 // Player
@@ -86,6 +98,25 @@ public class Game1 : Game
        player.CreateCollider();
        goblin.CreateCollider(); 
      
+       const float uiScale = 3.5f;
+       const int uiX = 15;
+       const int uiY = 15;
+
+       var barUI = new Sprite("BarUI");
+       barUI._transform._position = new Vector2(uiX, uiY);
+       barUI._transform._scale = new Vector2(uiScale, uiScale);
+       SceneManager.Add(barUI);
+
+       SceneManager.Add(new PlayerHealthBar(player, new Vector2(uiX, uiY), uiScale));
+       
+       var staminaBackground = new Sprite("BackgroundBar");
+       staminaBackground._sourceRectangle = new Rectangle(31, 8, 71, 3);
+       staminaBackground._transform._position =
+           new Vector2(uiX + 31 * uiScale, uiY + 18 * uiScale);
+       staminaBackground._transform._scale = new Vector2(uiScale, uiScale);
+       SceneManager.Add(staminaBackground);
+
+       SceneManager.Add(new PlayerStaminaBar(player, new Vector2(uiX, uiY), uiScale));
     }
     
     protected override void Update(GameTime gameTime)

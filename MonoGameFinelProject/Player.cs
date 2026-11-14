@@ -42,7 +42,7 @@ public class Player : Animation, IDamagable, IHealable
     private KeyboardState prevKeyboard;
     // jump
     private bool isAirborne = true;
-  //  private float groundY;
+    // private float groundY;
     private float verticalVelocity;
     private const float gravity = 1800f;
     private const float jumpVelocity = -800f;
@@ -54,9 +54,21 @@ public class Player : Animation, IDamagable, IHealable
     private const int heavyAttackDamage = 20;
     private int currentAttackDamage;
     private bool hasHitTarget;
-
+    // health bar
     private readonly Health _health = new Health(100);
+    public int CurrentHealth => _health.Current;
+    public int MaxHealth => _health.Maximum;
     private int parryHitFrame = 3;
+    // stamina bar    
+    private const float StaminaCapacity = 12f;
+    private const float LightAttackStaminaCost = 1f;
+    private const float HeavyAttackStaminaCost = 2f;
+    private const float JumpStaminaCost = StaminaCapacity * 0.20f;
+    private const float StaminaRegenDelay = 3f;
+    private const float StaminaRegenPerSecond = 1f;
+    public float CurrentStamina { get; private set; } = StaminaCapacity;
+    public float MaxStamina => StaminaCapacity;
+    private float staminaRegenTimer;
 
 
     public Player() : base(Idle)
@@ -140,10 +152,6 @@ public class Player : Animation, IDamagable, IHealable
         if(_action == e_PlayerAction.Death) return;
         if (isAirborne)
         {
-          //  Vector2 position = _transform._position;
-          //  position.Y = groundY;
-          //  _transform._position = position;
-          //  isAirborne = false;
             verticalVelocity = 0;
         }
         _health.TakeDamage(amount);
@@ -200,10 +208,34 @@ public class Player : Animation, IDamagable, IHealable
         }
     }
     
+    private bool TrySpendStamina(float amount)
+    {
+        if (CurrentStamina < amount)
+            return false;
+
+        CurrentStamina -= amount;
+        staminaRegenTimer = StaminaRegenDelay;
+        return true;
+    }
+
+    private void UpdateStamina(float deltaSeconds)
+    {
+        if (staminaRegenTimer > 0f)
+        {
+            staminaRegenTimer = Math.Max(0f, staminaRegenTimer - deltaSeconds);
+            return;
+        }
+
+        CurrentStamina = Math.Min(
+            StaminaCapacity,
+            CurrentStamina + StaminaRegenPerSecond * deltaSeconds);
+    }
+    
       public override void Update(GameTime gameTime)
     {
         KeyboardState keyboard = Keyboard.GetState();
         float deltaSeconds = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        UpdateStamina(deltaSeconds);
 
         bool lightAtkPressed = WasPressed(keyboard, Keys.J);
         bool heavyAtkPressed = WasPressed(keyboard, Keys.K);
@@ -212,7 +244,6 @@ public class Player : Animation, IDamagable, IHealable
 
         Vector2 position = _transform._position;
 
-        // Horizontal input works on the ground and in the air.
         int horizontal = 0;
         if (keyboard.IsKeyDown(Keys.A)) horizontal--;
         if (keyboard.IsKeyDown(Keys.D)) horizontal++;
@@ -266,7 +297,8 @@ public class Player : Animation, IDamagable, IHealable
                 if (heavyAtkPressed)
                 {
                     comboWindowOpen = false;
-                    StartPlayerAnimation(heavyAttack,e_PlayerAction.HeavyAttack,false,12);
+                    if(TrySpendStamina(HeavyAttackStaminaCost))
+                      StartPlayerAnimation(heavyAttack,e_PlayerAction.HeavyAttack,false,12);
                 }
                 else
                 {
@@ -290,14 +322,14 @@ public class Player : Animation, IDamagable, IHealable
             // Gravity and the Fall animation were handled earlier in Update.
             // This prevents the grounded actions below from running in midair.
         }
-        else if (jumpPressed)
+        else if (jumpPressed && TrySpendStamina(JumpStaminaCost))
         {
             isAirborne = true;
             verticalVelocity = jumpVelocity;
 
             StartPlayerAnimation(Jump, e_PlayerAction.Jump,false, 10);
         }
-        else if (lightAtkPressed)
+        else if (lightAtkPressed && TrySpendStamina(LightAttackStaminaCost))
         {
             StartPlayerAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.05);
         }
