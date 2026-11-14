@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using System.IO;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -10,8 +12,10 @@ public class Game1 : Game
     private SpriteBatch _spriteBatch;
     public static Vector2 ScreenSize = new Vector2(1920, 1080);
     SpriteManager _spriteManager = null;
-    AudioManager _audioManager = null;
+    private AudioManager _audioManager = null;
 
+    private Dictionary<Vector2, int> testMap;
+    
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -33,11 +37,47 @@ public class Game1 : Game
         base.Initialize();
     }
 
+    private Dictionary<Vector2, int> LoadMap(string filePath)
+    {
+        Dictionary<Vector2, int> result = new();
+        
+        StreamReader streamReader = new(filePath);
+
+        int y = 0;
+        string line;
+        while ((line = streamReader.ReadLine()) != null)
+        {
+            string[] values = line.Split(',');
+
+            for (int x = 0; x < values.Length; x++)
+            {
+                if (int.TryParse(values[x], out int value))
+                {
+                    if (value > -1)
+                    {
+                        result[new Vector2(x, y)] = value;
+                    }
+                }
+            }
+
+            y++;
+        }
+        
+        return result;
+    }
+
     protected override void LoadContent()
     {
         _spriteManager = new SpriteManager(Content);
         _audioManager = new AudioManager(Content); 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        
+//Texture Atlas
+        SpriteManager.AddSprite("Map","SpriteSheets/Enviroment/Enviroment",43,57);
+        
+//Map
+        testMap = LoadMap("Content/MapSheets/test level.csv");
+
 // Collider
         SpriteManager.AddSprite("Pixel", "Images/pixel");
 // Player
@@ -103,9 +143,35 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
 
+        int display_tilesize = 64;
+        int num_tiles_per_row = 57;
+        int pixel_tilesize = 16;
+
+        foreach (var tile in testMap)
+        {
+            Rectangle dest = new(
+                (int)(tile.Key.X * display_tilesize),
+                (int)(tile.Key.Y * display_tilesize),
+                display_tilesize,
+                display_tilesize);
+            
+            int x = tile.Value %  num_tiles_per_row;
+            int y = tile.Value /  num_tiles_per_row;
+            
+            Rectangle src = new(
+                x * pixel_tilesize,
+                y * pixel_tilesize,
+                pixel_tilesize,
+                pixel_tilesize);
+            
+            _spriteBatch.Draw(SpriteManager.GetSprite("Map").texture, dest, src, Color.White);
+        }
+
         SceneManager.Instance.Draw(_spriteBatch);
         
         _spriteBatch.End();
         base.Draw(gameTime);
     }
+    
+
 }
