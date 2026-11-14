@@ -33,7 +33,7 @@ public class Mimic : Enemy
             IsEnabled = true,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(145, 140, 80, 65),
-            showDebugOutline = true,
+            showDebugOutline = false,
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnGroundCollision;
@@ -45,7 +45,7 @@ public class Mimic : Enemy
             isTrigger = true,
             UseCustomBounds = true,
             LocalBounds = new Rectangle(225, 140, 45, 65),
-            showDebugOutline = true,
+            showDebugOutline = false,
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
@@ -56,8 +56,8 @@ public class Mimic : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 150, 220, 40),
-            showDebugOutline = true,
+            LocalBounds = new Rectangle(145, 150, 250, 40),
+            showDebugOutline = false,
             colliderType = Collider.e_ColliderType.Vision
         };
         visionCollider.onTrigger += OnVisionTrigger;

@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 namespace MonoGameFinelProject;
 
 public class Item : Sprite , IPickupable , ISellable
@@ -15,6 +16,7 @@ public class Item : Sprite , IPickupable , ISellable
 
     private string itemName{ get; set; }
     private string itemDescription { get; set; }
+    public string SpriteName { get; }
     private Sprite itemSprite{ get; set; }
     private e_ItemType itemType = e_ItemType.None;
     private bool isSellable { get; set; }
@@ -64,23 +66,40 @@ public class Item : Sprite , IPickupable , ISellable
         set { itemID = value; }
     }
     private Collider pickupCollider;
+    private readonly KeyboardPrompt ePrompt;
+    private bool touchedThisFrame ;
     public bool PlayerInRange { get; private set; }
 
     protected Item(string SpritenName) : base(SpritenName)
     {
-     //   _transform._scale = new Vector2(1.5f);
+        SpriteName = SpritenName;
+        _transform._scale = new Vector2(1.5f);
+
+        // Flickering 'E' key prompt above top-left of the item
+        ePrompt = new KeyboardPrompt(
+            Keys.E,
+            new Rectangle(0, 64, 16, 16),
+            new Rectangle(16, 64, 16, 16),
+            Vector2.Zero,
+            2.5f,
+            autoFlicker: true)
+        {
+            IsVisible = false
+        };
     }
 
     public void CreateCollider()
     {
+        _rect = GetDestRectangle(_sourceRectangle);
+        
         pickupCollider = new Collider
         {
             Parent = this,
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = false,
-            colliderType = Collider.e_ColliderType.Body,
-            showDebugOutline = true
+            colliderType = Collider.e_ColliderType.Item,
+            showDebugOutline = false
         };
         pickupCollider.onTrigger += OnPickupTrigger;
         SceneManager.Add(pickupCollider);
@@ -89,13 +108,39 @@ public class Item : Sprite , IPickupable , ISellable
     {
         if (other.colliderType == Collider.e_ColliderType.Body && other.Parent is Player)
         {
+            touchedThisFrame = true;
             PlayerInRange = true;
         }
     }
     public override void Update(GameTime gameTime)
     {
-        PlayerInRange = false; 
         base.Update(gameTime);
+        
+        PlayerInRange = false;
+        if (pickupCollider != null && pickupCollider.IsEnabled)
+        {
+            for (int i = 0; i < SceneManager.colliders.Count; i++)
+            {
+                Collider other = SceneManager.colliders[i];
+                if (other.IsEnabled && other.colliderType == Collider.e_ColliderType.Body &&
+                    other.Parent is Player && pickupCollider._rect.Intersects(other._rect))
+                {
+                    PlayerInRange = true;
+                    break;
+                }
+            }
+        }
+        ePrompt.IsVisible = PlayerInRange;
+        if (PlayerInRange)
+        {
+            ePrompt._transform._position = new Vector2(_rect.Left - 15, _rect.Top - 30);
+            ePrompt.Update(gameTime);
+        }
+    }
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        ePrompt.Draw(spriteBatch);
     }
 
     public bool TryPickup(Player player)
@@ -103,6 +148,7 @@ public class Item : Sprite , IPickupable , ISellable
         if (player == null) return false;
         
         player.Inventory.AddItem(ItemID,ItemQuantity);
+        player.OnItemPickedUp(this);
         if (pickupCollider != null)
         {
             pickupCollider.IsEnabled = false;

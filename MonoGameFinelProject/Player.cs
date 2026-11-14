@@ -35,6 +35,7 @@ public class Player : Animation, IDamagable, IHealable
     public float speed = 500f;
     // colliders
     private Collider bodyCollider;
+    public Collider BodyCollider => bodyCollider;
     private Collider feetCollider;
     private Collider attackCollider;
     
@@ -49,7 +50,7 @@ public class Player : Animation, IDamagable, IHealable
     // attack combo
     private bool comboWindowOpen;
     private float comboWindowRemaining;
-    private const float ComboWindowSeconds = 0.2f;
+    private const float ComboWindowSeconds = 0.35f;
     private const int lightAttackDamage = 10;
     private const int heavyAttackDamage = 20;
     private int currentAttackDamage;
@@ -72,8 +73,13 @@ public class Player : Animation, IDamagable, IHealable
     // inventory
     private readonly PlayerInventory _inventory = new();
     public PlayerInventory Inventory => _inventory;
+    // key prompt
+    private KeyboardPrompt comboKPrompt;
+    public string DisplayedInventoryItemId { get; private set; }
+    public event Action<Item> ItemPickedUp;
 
-
+    public event Action<int> InventoryCycled;
+    
     public Player() : base(Idle)
     {
         _transform._position = new Vector2(100, 500);
@@ -81,7 +87,17 @@ public class Player : Animation, IDamagable, IHealable
         _transform._scale = Vector2.One * 1.5f;
         _color = Color.White;
         _effects = SpriteEffects.None;
-
+        comboKPrompt = new KeyboardPrompt(
+            Keys.K,
+            new Rectangle(0, 160, 16, 16),
+            new Rectangle(16, 160, 16, 16),
+            Vector2.Zero,
+            2.8f,
+            autoFlicker: true)
+        {
+            IsVisible = false
+        };
+        
         PlayAnimation(isLooping: true, samples: 10);
     }
 
@@ -252,7 +268,10 @@ public class Player : Animation, IDamagable, IHealable
             }
         }
     }
-    
+    private void CycleInventory(int direction)
+    {
+        InventoryCycled?.Invoke(direction);
+    }
       public override void Update(GameTime gameTime)
     {
         KeyboardState keyboard = Keyboard.GetState();
@@ -265,6 +284,14 @@ public class Player : Animation, IDamagable, IHealable
         if (WasPressed(keyboard, Keys.E))
         {
             TryInteract();
+        }
+        if (WasPressed(keyboard, Keys.OemComma) || WasPressed(keyboard, Keys.Left))
+        {
+            CycleInventory(-1);
+        }
+        if (WasPressed(keyboard, Keys.OemPeriod) || WasPressed(keyboard, Keys.Right))
+        {
+            CycleInventory(1);
         }
         if(WasPressed(keyboard,Keys.B)) TakeDamage(20);
 
@@ -367,6 +394,26 @@ public class Player : Animation, IDamagable, IHealable
         _transform._position = position;
 
         base.Update(gameTime);
+        comboKPrompt.IsVisible = comboWindowOpen && _action == e_PlayerAction.LightAttack && StaminaCapacity >= HeavyAttackStaminaCost;
+        if (comboKPrompt.IsVisible && bodyCollider != null)
+        { 
+            comboKPrompt._transform._position = new Vector2(
+                bodyCollider._rect.Right - 10,
+                bodyCollider._rect.Top - 30);
+            comboKPrompt.Update(gameTime);
+        }
         prevKeyboard = keyboard;
+    }
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        comboKPrompt.Draw(spriteBatch);
+    }
+
+    public void OnItemPickedUp(Item item)
+    {
+        if (item == null) return;
+        DisplayedInventoryItemId = item.ItemID;
+        ItemPickedUp?.Invoke(item);
     }
 }

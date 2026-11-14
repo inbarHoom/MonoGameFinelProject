@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework.Input;
+
 namespace MonoGameFinelProject;
 using System;
 using Microsoft.Xna.Framework;
@@ -10,7 +12,8 @@ public class Collider : Sprite
         Body,
         Attack,
         Vision,
-        Ground
+        Ground,
+        Item
     }
     
     public e_ColliderType colliderType = e_ColliderType.None;
@@ -47,6 +50,8 @@ public class Collider : Sprite
     
     public override void Update(GameTime gameTime)
     {
+        if (Keyboard.GetState().IsKeyDown(Keys.Z))
+            TurnOffCollider();
         if (Parent == null || !IsEnabled) return;
         base.Update(gameTime);
         RefreshBounds();
@@ -92,6 +97,15 @@ public class Collider : Sprite
         _rect = new Rectangle(parentRect.X + offsetX, parentRect.Y + LocalBounds.Y, LocalBounds.Width, LocalBounds.Height);
     }
 
+    private void TurnOffCollider()
+    {
+        for (int i = 0; i < SceneManager.colliders.Count; i++)
+        {
+            Collider other = SceneManager.colliders[i];
+            other.showDebugOutline = !other.showDebugOutline;
+        }
+    }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         if(!IsEnabled || !showDebugOutline) return;
@@ -119,6 +133,9 @@ public class Collider : Sprite
             }
             case e_ColliderType.Ground:
                 color = Color.SaddleBrown;
+                break;
+            case e_ColliderType.Item:
+                color = Color.HotPink;
                 break;
         }
         

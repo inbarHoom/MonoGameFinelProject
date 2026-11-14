@@ -154,16 +154,24 @@ public class Game1 : Game
            uiY + 32 * uiScale -10);
        coinIcon._transform._scale = new Vector2(1.2f);
        SceneManager.Add(coinIcon);
-
+       
        Text coinCount = new Text();
         coinCount._transform._position = new Vector2(
             coinIcon._transform._position.X * 1.5f, coinIcon._transform._position.Y + 30);
         coinCount._font = dungeonFont;
         coinCount._textScale = new Vector2(2.5f, 2.5f);
         coinCount._text = "0";
-       
         SceneManager.Add(coinCount);
        
+        player.ItemPickedUp += item =>
+        {
+            if (item.ItemID == "Gold_Coins")
+            {
+                int totalCoins = player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
+                coinCount._text = totalCoins.ToString();
+            }
+        };
+        
        const float itemSlotScale = 3f;
        const float iconScale = 0.3f;
        const int bottomMargin = 24;
@@ -203,6 +211,8 @@ public class Game1 : Game
        inventorySlot._transform._position = new Vector2(inventorySlotX, slotY);
        inventorySlot._transform._scale = new Vector2(itemSlotScale);
        SceneManager.Add(inventorySlot);
+       
+       SceneManager.Add(new InventorySlotUI(player, new Vector2(inventorySlotX, slotY), slotSize, dungeonFont));
 
        var lightIcon = new Sprite("LightAttackUI");
        lightIcon._transform._position= new Vector2(leftSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
