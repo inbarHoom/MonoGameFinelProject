@@ -2,8 +2,17 @@ namespace MonoGameFinelProject;
 
 public class BombPickUp : Item
 {
-    protected BombPickUp() : base("BombPickup")
+    private int damage;
+    public BombPickUp() : base("BombPickup")
     {
-        
+        ItemName = "Bomb";
+        ItemDescription = "A big bomb you can throw or sell ";
+        ItemSprite = new Sprite("BombPickup");
+        ItemType = e_ItemType.Weapon;
+        IsSellable = true;
+        ItemPrice = 5;
+        ItemQuantity = 0;
+        ItemID = "Bomb_Pickup";
+        damage = 50;
     }
 }

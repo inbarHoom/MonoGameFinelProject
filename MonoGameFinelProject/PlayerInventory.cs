@@ -21,6 +21,10 @@ public class PlayerInventory
 
     public bool TryRemoveItem(string itemId, int amount = 1)
     {
+        if (amount <= 0)
+            return false;
+        if(itemId == "" || itemId == null)
+            return false;
         if (!_items.ContainsKey(itemId))
             return false;
 
