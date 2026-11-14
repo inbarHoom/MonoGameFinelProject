@@ -13,6 +13,36 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../../../OneDrive/Documents/output/level 1.csv
+/copy:../../../../OneDrive/Documents/output/level 1.csv;MapSheets/level 1.csv
+
+#begin ../../../../OneDrive/Documents/output/level 10.csv
+/copy:../../../../OneDrive/Documents/output/level 10.csv;MapSheets/level 10.csv
+
+#begin ../../../../OneDrive/Documents/output/level 2.csv
+/copy:../../../../OneDrive/Documents/output/level 2.csv;MapSheets/level 2.csv
+
+#begin ../../../../OneDrive/Documents/output/level 3.csv
+/copy:../../../../OneDrive/Documents/output/level 3.csv;MapSheets/level 3.csv
+
+#begin ../../../../OneDrive/Documents/output/level 4.csv
+/copy:../../../../OneDrive/Documents/output/level 4.csv;MapSheets/level 4.csv
+
+#begin ../../../../OneDrive/Documents/output/level 5.csv
+/copy:../../../../OneDrive/Documents/output/level 5.csv;MapSheets/level 5.csv
+
+#begin ../../../../OneDrive/Documents/output/level 6.csv
+/copy:../../../../OneDrive/Documents/output/level 6.csv;MapSheets/level 6.csv
+
+#begin ../../../../OneDrive/Documents/output/level 7.csv
+/copy:../../../../OneDrive/Documents/output/level 7.csv;MapSheets/level 7.csv
+
+#begin ../../../../OneDrive/Documents/output/level 8.csv
+/copy:../../../../OneDrive/Documents/output/level 8.csv;MapSheets/level 8.csv
+
+#begin ../../../../OneDrive/Documents/output/level 9.csv
+/copy:../../../../OneDrive/Documents/output/level 9.csv;MapSheets/level 9.csv
+
 #begin Images/pixel.png
 /importer:TextureImporter
 /processor:TextureProcessor
