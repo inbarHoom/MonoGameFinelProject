@@ -121,7 +121,11 @@ public class Game1 : Game
        
        player.CreateCollider();
        goblin.CreateCollider(); 
-     
+       
+       var chest = SceneManager.Create<Chest>();
+       chest._transform._position = new Vector2(450, 695); 
+       chest.CreateCollider();
+       
        const float uiScale = 3.5f;
        const int uiX = 15;
        const int uiY = 15;

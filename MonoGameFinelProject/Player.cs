@@ -71,7 +71,6 @@ public class Player : Animation, IDamagable, IHealable
     private float staminaRegenTimer;
     // inventory
     private readonly PlayerInventory _inventory = new();
-
     public PlayerInventory Inventory => _inventory;
 
 
@@ -234,6 +233,25 @@ public class Player : Animation, IDamagable, IHealable
             StaminaCapacity,
             CurrentStamina + StaminaRegenPerSecond * deltaSeconds);
     }
+    private void TryInteract()
+    {
+        for (int i = 0; i < SceneManager.colliders.Count; i++)
+        {
+            Sprite parent = SceneManager.colliders[i].Parent;
+
+            if (parent is Chest chest && chest.PlayerInRange)
+            {
+                chest.Open();
+                return;
+            }
+
+            if (parent is Item item && item.PlayerInRange)
+            {
+                item.TryPickup(this);
+                return;
+            }
+        }
+    }
     
       public override void Update(GameTime gameTime)
     {
@@ -244,6 +262,10 @@ public class Player : Animation, IDamagable, IHealable
         bool lightAtkPressed = WasPressed(keyboard, Keys.J);
         bool heavyAtkPressed = WasPressed(keyboard, Keys.K);
         bool jumpPressed = WasPressed(keyboard, Keys.Space);
+        if (WasPressed(keyboard, Keys.E))
+        {
+            TryInteract();
+        }
         if(WasPressed(keyboard,Keys.B)) TakeDamage(20);
 
         Vector2 position = _transform._position;

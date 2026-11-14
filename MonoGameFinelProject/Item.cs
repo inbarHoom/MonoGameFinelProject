@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework;
+
 namespace MonoGameFinelProject;
 
 public class Item : Sprite , IPickupable , ISellable
@@ -19,7 +21,7 @@ public class Item : Sprite , IPickupable , ISellable
     private int itemPrice { get; set; }
     private int itemQuantity { get; set; }
     private string itemID {get;set;}
-
+    
     public string ItemName
     {
         get { return itemName; }
@@ -61,14 +63,53 @@ public class Item : Sprite , IPickupable , ISellable
         get { return itemID; }
         set { itemID = value; }
     }
+    private Collider pickupCollider;
+    public bool PlayerInRange { get; private set; }
 
     protected Item(string SpritenName) : base(SpritenName)
     {
+     //   _transform._scale = new Vector2(1.5f);
+    }
+
+    public void CreateCollider()
+    {
+        pickupCollider = new Collider
+        {
+            Parent = this,
+            IsEnabled = true,
+            isTrigger = true,
+            UseCustomBounds = false,
+            colliderType = Collider.e_ColliderType.Body,
+            showDebugOutline = true
+        };
+        pickupCollider.onTrigger += OnPickupTrigger;
+        SceneManager.Add(pickupCollider);
+    }
+    private void OnPickupTrigger(Collider self, Collider other)
+    {
+        if (other.colliderType == Collider.e_ColliderType.Body && other.Parent is Player)
+        {
+            PlayerInRange = true;
+        }
+    }
+    public override void Update(GameTime gameTime)
+    {
+        PlayerInRange = false; 
+        base.Update(gameTime);
     }
 
     public bool TryPickup(Player player)
     {
-        throw new System.NotImplementedException();
+        if (player == null) return false;
+        
+        player.Inventory.AddItem(ItemID,ItemQuantity);
+        if (pickupCollider != null)
+        {
+            pickupCollider.IsEnabled = false;
+            SceneManager.Remove(pickupCollider);
+        }
+        SceneManager.Remove(this);
+        return true;
     }
 
     public void Sell(Item item)
