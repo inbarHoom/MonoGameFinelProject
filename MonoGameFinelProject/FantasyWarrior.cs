@@ -111,6 +111,7 @@ public class FantasyWarrior : Enemy
     {
         StartEnemyAnimation(Death, e_EnemyState.Death, false, 8);
     }
+    protected override string RollDeathDropItemId() => EnemyLootTable.RollEliteDropItemId();
 
     protected override bool UpdateSpecificBehavior(
         GameTime gameTime,

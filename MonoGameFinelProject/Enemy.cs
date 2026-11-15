@@ -38,6 +38,10 @@ public  class Enemy : Animation , IDamagable
     public int CurrentHealth => _health.Current;
     public int MaxHealth => _health.Maximum;
     public bool IsDead => _state == e_EnemyState.Death;
+    
+    private bool _deathLootHandled;
+    protected virtual string RollDeathDropItemId() => null;
+    
     protected Enemy(string SpriteName, int maxHealth) : base(SpriteName)
     {
         _health = new Health(maxHealth);
@@ -169,7 +173,17 @@ public  class Enemy : Animation , IDamagable
         
         if (_state == e_EnemyState.Death)
         {
-            if(!isFinished) base.Update(gameTime);
+            if(!isFinished)
+                base.Update(gameTime);
+            if (isFinished && !_deathLootHandled)
+            {
+                _deathLootHandled = true;
+
+                string itemId = RollDeathDropItemId();
+                if (itemId != null)
+                    EnemyLootSpawner.Spawn(this, itemId);
+            }
+
             return;
         }
 

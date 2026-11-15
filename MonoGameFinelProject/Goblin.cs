@@ -164,6 +164,7 @@ public class Goblin : Enemy
     {
         StartEnemyAnimation(Idle, e_EnemyState.Idle, loops: true, framesPerSecond: 4);
     }
+    protected override string RollDeathDropItemId() => ChestLootTable.RollOneItemId();
     public override void Update(GameTime gameTime)
     {
         bool playerWasInBombRange = playerInBombRange;
