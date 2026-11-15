@@ -34,7 +34,7 @@ public class King : Enemy
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 75, 75, 80),
+            LocalBounds = new Rectangle(100, 80, 75, 95),
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnGroundCollision;
@@ -46,7 +46,7 @@ public class King : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 80, 55, 75),
+            LocalBounds = new Rectangle(160, 90, 15, 85),
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
@@ -58,7 +58,7 @@ public class King : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 97, 230, 20),
+            LocalBounds = new Rectangle(120, 97, 230, 20),
             colliderType = Collider.e_ColliderType.Vision
         };
         visionCollider.onTrigger += OnVisionTrigger;

@@ -54,7 +54,7 @@ public class DeathBringer : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(80, 80, 100, 95),
+            LocalBounds = new Rectangle(160, 80, 10, 95),
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;

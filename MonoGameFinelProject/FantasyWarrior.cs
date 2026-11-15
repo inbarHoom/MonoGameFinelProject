@@ -34,7 +34,7 @@ public class FantasyWarrior : Enemy
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 75, 75, 80),
+            LocalBounds = new Rectangle(90, 75, 55, 80),
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnGroundCollision;
@@ -46,7 +46,7 @@ public class FantasyWarrior : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 80, 45, 70),
+            LocalBounds = new Rectangle(145, 80, 15, 70),
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
@@ -58,7 +58,7 @@ public class FantasyWarrior : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 97, 200, 20),
+            LocalBounds = new Rectangle(120, 90, 200, 20),
             colliderType = Collider.e_ColliderType.Vision
         };
         visionCollider.onTrigger += OnVisionTrigger;

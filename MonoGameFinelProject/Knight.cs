@@ -32,7 +32,7 @@ public class Knight : Enemy
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 75, 75, 80),
+            LocalBounds = new Rectangle(100, 95, 75, 80),
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnGroundCollision;
@@ -44,7 +44,7 @@ public class Knight : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 80, 45, 70),
+            LocalBounds = new Rectangle(165, 90, 25, 65),
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
@@ -56,7 +56,7 @@ public class Knight : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 97, 190, 20),
+            LocalBounds = new Rectangle(140, 97, 190, 20),
             colliderType = Collider.e_ColliderType.Vision
         };
         visionCollider.onTrigger += OnVisionTrigger;

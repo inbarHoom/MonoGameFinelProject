@@ -101,28 +101,28 @@ public class Game1 : Game
 // DeathBringer
         SpriteManager.AddSprite("DeathBringerSheet", "SpriteSheets/DeathBringer/Bringer-of-Death-SpritSheet", 8, 8);
 // FantasyWarrior
-        SpriteManager.AddSprite("FantasyWarriorAttack1", "SpriteSheets/FantasyWarrior/Attack1");
-        SpriteManager.AddSprite("FantasyWarriorAttack2", "SpriteSheets/FantasyWarrior/Attack2");
-        SpriteManager.AddSprite("FantasyWarriorAttack3", "SpriteSheets/FantasyWarrior/Attack3");
-        SpriteManager.AddSprite("FantasyWarriorDeath", "SpriteSheets/FantasyWarrior/Death");
-        SpriteManager.AddSprite("FantasyWarriorIdle", "SpriteSheets/FantasyWarrior/Idle");
-        SpriteManager.AddSprite("FantasyWarriorRun", "SpriteSheets/FantasyWarrior/Run");
-        SpriteManager.AddSprite("FantasyWarriorHit", "SpriteSheets/FantasyWarrior/Take hit");
+        SpriteManager.AddSprite("FantasyWarriorAttack1", "SpriteSheets/FantasyWarrior/Attack1" , 1 ,7);
+        SpriteManager.AddSprite("FantasyWarriorAttack2", "SpriteSheets/FantasyWarrior/Attack2" , 1 ,7);
+        SpriteManager.AddSprite("FantasyWarriorAttack3", "SpriteSheets/FantasyWarrior/Attack3" , 1 ,8);
+        SpriteManager.AddSprite("FantasyWarriorDeath", "SpriteSheets/FantasyWarrior/Death" , 1 ,7);
+        SpriteManager.AddSprite("FantasyWarriorIdle", "SpriteSheets/FantasyWarrior/Idle" , 1 ,10);
+        SpriteManager.AddSprite("FantasyWarriorRun", "SpriteSheets/FantasyWarrior/Run" , 1 ,8);
+        SpriteManager.AddSprite("FantasyWarriorHit", "SpriteSheets/FantasyWarrior/Take hit" , 1 ,3);
 // King
-        SpriteManager.AddSprite("KingAttack1", "SpriteSheets/King/Attack1");
-        SpriteManager.AddSprite("KingAttack2", "SpriteSheets/King/Attack2");
-        SpriteManager.AddSprite("KingAttack3", "SpriteSheets/King/Attack3");
-        SpriteManager.AddSprite("KingDeath", "SpriteSheets/King/Death");
-        SpriteManager.AddSprite("KingIdle", "SpriteSheets/King/Idle");
-        SpriteManager.AddSprite("KingRun", "SpriteSheets/King/Run");
-        SpriteManager.AddSprite("KingHit", "SpriteSheets/King/Take Hit - white silhouette");
+        SpriteManager.AddSprite("KingAttack1", "SpriteSheets/King/Attack1" , 1 ,4);
+        SpriteManager.AddSprite("KingAttack2", "SpriteSheets/King/Attack2" , 1 ,4);
+        SpriteManager.AddSprite("KingAttack3", "SpriteSheets/King/Attack3" , 1 ,4);
+        SpriteManager.AddSprite("KingDeath", "SpriteSheets/King/Death" , 1 ,6);
+        SpriteManager.AddSprite("KingIdle", "SpriteSheets/King/Idle" , 1 ,8);
+        SpriteManager.AddSprite("KingRun", "SpriteSheets/King/Run" , 1 ,8);
+        SpriteManager.AddSprite("KingHit", "SpriteSheets/King/Take Hit - white silhouette" , 1 ,4);
 // Knight
-        SpriteManager.AddSprite("KnightAttack1", "SpriteSheets/Knight/Attack1");
-        SpriteManager.AddSprite("KnightAttack2", "SpriteSheets/Knight/Attack2");
-        SpriteManager.AddSprite("KnightDeath", "SpriteSheets/Knight/Death");
-        SpriteManager.AddSprite("KnightIdle", "SpriteSheets/Knight/Idle");
-        SpriteManager.AddSprite("KnightRun", "SpriteSheets/Knight/Run");
-        SpriteManager.AddSprite("KnightHit", "SpriteSheets/Knight/Take Hit");
+        SpriteManager.AddSprite("KnightAttack1", "SpriteSheets/Knight/Attack1" , 1 ,7);
+        SpriteManager.AddSprite("KnightAttack2", "SpriteSheets/Knight/Attack2" , 1 ,7);
+        SpriteManager.AddSprite("KnightDeath", "SpriteSheets/Knight/Death" , 1 ,11);
+        SpriteManager.AddSprite("KnightIdle", "SpriteSheets/Knight/Idle" , 1 ,11);
+        SpriteManager.AddSprite("KnightRun", "SpriteSheets/Knight/Run" , 1 ,8);
+        SpriteManager.AddSprite("KnightHit", "SpriteSheets/Knight/Take Hit" , 1 ,4);
         
         Init();
     }
@@ -144,11 +144,11 @@ public class Game1 : Game
         SceneManager.Add(floorCollider);
         
        var player = SceneManager.Create<Player>();
-       var goblin = SceneManager.Create<Goblin>();
+      //var goblin = SceneManager.Create<Goblin>();
        
        player.CreateCollider();
-       goblin.CreateCollider(); 
-       SceneManager.Add(new EnemyHealthBar(goblin));
+       //goblin.CreateCollider(); 
+     //  SceneManager.Add(new EnemyHealthBar(goblin));
        
        var deathBringer = SceneManager.Create<DeathBringer>();
        deathBringer._transform._position = new Vector2(1200, 530);
