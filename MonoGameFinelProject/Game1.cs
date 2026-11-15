@@ -6,6 +6,10 @@ namespace MonoGameFinelProject;
 
 public class Game1 : Game
 {
+    public const float LevelWidth = 9600f;
+    private Player _player;
+    private readonly LevelManager _levelManager = new();
+    
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
     public static Vector2 ScreenSize = new Vector2(1920, 1080);
@@ -124,14 +128,24 @@ public class Game1 : Game
         SpriteManager.AddSprite("KnightRun", "SpriteSheets/Knight/Run" , 1 ,8);
         SpriteManager.AddSprite("KnightHit", "SpriteSheets/Knight/Take Hit" , 1 ,4);
         
+       // Terrain
+       SpriteManager.AddSprite("TerrainSky", "Terrain/sky");
+       SpriteManager.AddSprite("TerrainHills", "Terrain/Hills");
+       SpriteManager.AddSprite("TerrainBackgroundTrees", "Terrain/tree_cluster_background1");
+       SpriteManager.AddSprite("TerrainGround", "Terrain/Ground");
+       SpriteManager.AddSprite("TerrainMidgroundTree", "Terrain/tree_cluster_midground1");
+       SpriteManager.AddSprite("TerrainForegroundTrees", "Terrain/tree_cluster_foreground1");
+       SpriteManager.AddSprite("TerrainForegroundFoliage", "Terrain/foliage_cluster_foreground1");
+        
         Init();
     }
 
     void Init()
     {
+        SpawnLevel();
         var floor = new Sprite("Pixel");
         floor._transform._position = new Vector2(0, 900);
-        floor._transform._scale = new Vector2(ScreenSize.X, 20);
+        floor._transform._scale = new Vector2(LevelWidth, 20);
         floor._color = Color.Yellow;
         SceneManager.Add(floor);
 
@@ -143,11 +157,17 @@ public class Game1 : Game
         };
         SceneManager.Add(floorCollider);
         
-       var player = SceneManager.Create<Player>();
+        _player = SceneManager.Create<Player>();
+        _player.CreateCollider();
+        _player._transform._position = new Vector2(180, 500);
        
-      var goblin = SceneManager.Create<Goblin>();
-       
-       player.CreateCollider();
+        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
+        SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.12f));
+        SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 420, 1f, 0.25f));
+        SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 1f, 0.6f));
+        SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 740, 1f, 0.85f));
+        
+      /*var goblin = SceneManager.Create<Goblin>();
        goblin.CreateCollider(); 
        SceneManager.Add(new EnemyHealthBar(goblin));
        
@@ -173,15 +193,17 @@ public class Game1 : Game
        
        var chest = SceneManager.Create<Chest>();
        chest._transform._position = new Vector2(450, 695); 
-       chest.CreateCollider();
+       chest.CreateCollider();*/
        
+       
+       // HUD
        const float uiScale = 3.5f;
        const int uiX = 15;
        const int uiY = 15;
 
        
 
-       SceneManager.Add(new PlayerHealthBar(player, new Vector2(uiX, uiY), uiScale));
+       SceneManager.Add(new PlayerHealthBar(_player, new Vector2(uiX, uiY), uiScale));
        
        var staminaBackground = new Sprite("BackgroundBar");
        staminaBackground._sourceRectangle = new Rectangle(31, 8, 71, 3);
@@ -190,7 +212,7 @@ public class Game1 : Game
        staminaBackground._transform._scale = new Vector2(uiScale, uiScale);
        AddHudSprite(staminaBackground);
 
-       AddHudSprite(new PlayerStaminaBar(player, new Vector2(uiX, uiY), uiScale));
+       AddHudSprite(new PlayerStaminaBar(_player, new Vector2(uiX, uiY), uiScale));
        
        var barUI = new Sprite("BarUI");
        barUI._transform._position = new Vector2(uiX, uiY);
@@ -212,11 +234,11 @@ public class Game1 : Game
         coinCount._text = "0";
         SceneManager.Add(coinCount);
        
-        player.ItemPickedUp += item =>
+        _player.ItemPickedUp += item =>
         {
             if (item.ItemID == "Gold_Coins")
             {
-                int totalCoins = player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
+                int totalCoins = _player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
                 coinCount._text = totalCoins.ToString();
             }
         };
@@ -235,76 +257,59 @@ public class Game1 : Game
         const float rightMargin = 80f;
 
         float slotY = ScreenSize.Y - slotSize - bottomMargin;
-        float leftSlotX = leftMargin; // light attack back
-        float rightSlotX = leftSlotX + slotSize + attackSlotGap; // heavy back
-        float pickupSlotX = rightSlotX + slotSize + attackSlotGap; // pick up back
-
-        float inventorySlotX = ScreenSize.X - slotSize - rightMargin;
+        float leftSlotX = leftMargin; 
+        float rightSlotX = leftSlotX + slotSize + attackSlotGap; 
+        float pickupSlotX = rightSlotX + slotSize + attackSlotGap; 
         
+        float inventorySlotX = ScreenSize.X - slotSize - rightMargin;
        var leftSlot = new Sprite("ItemSlot");
        leftSlot._transform._position = new Vector2(leftSlotX, slotY);
        leftSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(leftSlot);
-
        var rightSlot = new Sprite("ItemSlot");
        rightSlot._transform._position = new Vector2(rightSlotX, slotY);
        rightSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(rightSlot);
-       
        var pickupSlot = new Sprite("ItemSlot");
        pickupSlot._transform._position = new Vector2(pickupSlotX, slotY);
        pickupSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(pickupSlot);
-       
        var inventorySlot = new Sprite("ItemSlot");
        inventorySlot._transform._position = new Vector2(inventorySlotX, slotY);
        inventorySlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(inventorySlot);
-       
-       SceneManager.Add(new InventorySlotUI(player, new Vector2(inventorySlotX, slotY), slotSize, dungeonFont));
-
+       SceneManager.Add(new InventorySlotUI(_player, new Vector2(inventorySlotX, slotY), slotSize, dungeonFont));
        var lightIcon = new Sprite("LightAttackUI");
        lightIcon._transform._position= new Vector2(leftSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        lightIcon._transform._scale = new Vector2(iconScale);
        AddHudSprite(lightIcon);
-
        var heavyIcon = new Sprite("HeavyAttackUI");
        heavyIcon._transform._position = new Vector2(rightSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        heavyIcon._transform._scale = new Vector2(iconScale);
        AddHudSprite(heavyIcon);
-
        float pickupIconScale = iconSize / 32f;
-       
        var pickupIcon = new Sprite("PickupIcon");
        pickupIcon._transform._position = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        pickupIcon._transform._scale = new Vector2(pickupIconScale);
        AddHudSprite(pickupIcon);
-       
        Vector2 lightIconPosition = new Vector2(
            leftSlotX + (slotWidth - iconSize) / 2, 
            slotY + (slotHeight - iconSize) / 2);
-
        Vector2 heavyIconPosition = new Vector2(
            rightSlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
-       
        float keyScale = 4f;
        Vector2 keyOffset = new Vector2(-30, -30);
-       
        Vector2 pickupSlotPosition = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
        Vector2 inventorySlotPosition = new Vector2( inventorySlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
-
-
        Vector2  lightKeyPosition = new Vector2(
            (int)MathF.Round(lightIconPosition.X + keyOffset.X),
            (int)MathF.Round(lightIconPosition.Y + keyOffset.Y));
-       
        Vector2  heavyKeyPosition = new Vector2(
            (int)MathF.Round(heavyIconPosition.X + keyOffset.X),
            (int)MathF.Round(heavyIconPosition.Y + keyOffset.Y));
-       
        var lightKeyPrompt = new KeyboardPrompt(
            Keys.J,
            new Rectangle(0, 144, 16, 16), // J released
@@ -319,8 +324,6 @@ public class Game1 : Game
            heavyKeyPosition,
            keyScale);
        AddHudSprite(heavyPrompt);
-      
-       
        var pickupPrompt =new KeyboardPrompt(
            Keys.E,
            new Rectangle(0, 64, 16, 16), // E released
@@ -328,7 +331,6 @@ public class Game1 : Game
            pickupSlotPosition + keyOffset,
            keyScale);
        AddHudSprite(pickupPrompt);
-
        var interactPrompt =new KeyboardPrompt(
            Keys.F,
            new Rectangle(0, 80, 16, 16), // F released
@@ -336,7 +338,6 @@ public class Game1 : Game
            inventorySlotPosition + keyOffset,
            keyScale);
        AddHudSprite(interactPrompt);
-       
       var invLeft =new KeyboardPrompt( 1,
            Keys.OemComma,
            new Rectangle(0, 270, 16, 16), // < released
@@ -358,9 +359,14 @@ public class Game1 : Game
         
         if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
             Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit(); 
-        if(!GameOver)
+            Exit();
+        if (!GameOver)
+        {
             SceneManager.Instance.Update(gameTime);
+            _levelManager.Update(_player);
+            Camera2D.Follow(_player, LevelWidth, ScreenSize.X);
+        }
+
         base.Update(gameTime);
     }
 
@@ -379,4 +385,171 @@ public class Game1 : Game
         sprite.UseCamera = false;
         SceneManager.Add(sprite);
     }
+    private void SpawnLevel()
+{
+    const float sectionWidth = LevelManager.SectionWidth;
+
+    var section1 = new LevelSection(0, sectionWidth);
+    var section2 = new LevelSection(sectionWidth, sectionWidth * 2);
+    var section3 = new LevelSection(sectionWidth * 2, sectionWidth * 3);
+    var section4 = new LevelSection(sectionWidth * 3, sectionWidth * 4);
+
+    _levelManager.AddSection(section1);
+    _levelManager.AddSection(section2);
+    _levelManager.AddSection(section3);
+    _levelManager.AddSection(section4);
+
+    // ---- SECTION 1 ----
+    var chest1 = SceneManager.Create<Chest>();
+    chest1._transform._position = new Vector2(1200, 695);
+    chest1.CreateCollider();
+    section1.Chests.Add(chest1);
+
+  
+    var goblin1 = SceneManager.Create<Goblin>();
+    goblin1._transform._position = new Vector2(700, 530);
+    goblin1._effects = SpriteEffects.None;
+    goblin1.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(goblin1));
+    section1.Enemies.Add(goblin1);
+
+   
+    var goblin2 = SceneManager.Create<Goblin>();
+    goblin2._transform._position = new Vector2(1600, 530);
+    goblin2._effects = SpriteEffects.FlipHorizontally;
+    goblin2.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(goblin2));
+    section1.Enemies.Add(goblin2);
+
+    var goblin3 = SceneManager.Create<Goblin>();
+    goblin3._transform._position = new Vector2(1900, 530);
+    goblin3._effects = SpriteEffects.FlipHorizontally;
+    goblin3.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(goblin3));
+    section1.Enemies.Add(goblin3);
+
+    // ---- SECTION 2 ----
+    var goblin4 = SceneManager.Create<Goblin>();
+    goblin4._transform._position = new Vector2(3000, 530);
+    goblin4._effects = SpriteEffects.FlipHorizontally;
+    goblin4.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(goblin4));
+    section2.Enemies.Add(goblin4);
+
+    var knight1 = SceneManager.Create<Knight>();
+    knight1._transform._position = new Vector2(3550, 530);
+    knight1._effects = SpriteEffects.FlipHorizontally;
+    knight1.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(knight1));
+    section2.Enemies.Add(knight1);
+
+    var chest2 = SceneManager.Create<Chest>();
+    chest2._transform._position = new Vector2(4500, 695);
+    chest2.CreateCollider();
+    section2.Chests.Add(chest2);
+
+    // ---- SECTION 3 ----
+    var chest3 = SceneManager.Create<Chest>();
+    chest3._transform._position = new Vector2(5400, 695);
+    chest3.CreateCollider();
+    section3.Chests.Add(chest3);
+
+    var chest4 = SceneManager.Create<Chest>();
+    chest4._transform._position = new Vector2(5800, 695);
+    chest4.CreateCollider();
+    section3.Chests.Add(chest4);
+
+    var knight2 = SceneManager.Create<Knight>();
+    knight2._transform._position = new Vector2(6300, 530);
+    knight2._effects = SpriteEffects.FlipHorizontally;
+    knight2.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(knight2));
+    section3.Enemies.Add(knight2);
+
+    var fantasyWarrior = SceneManager.Create<FantasyWarrior>();
+    fantasyWarrior._transform._position = new Vector2(6700, 530);
+    fantasyWarrior._effects = SpriteEffects.FlipHorizontally;
+    fantasyWarrior.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(fantasyWarrior));
+    section3.Enemies.Add(fantasyWarrior);
+
+    // ---- SECTION 4 ----
+    var king = SceneManager.Create<King>();
+    king._transform._position = new Vector2(8200, 530);
+    king._effects = SpriteEffects.FlipHorizontally;
+    king.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(king));
+    section4.Enemies.Add(king);
+
+    var deathBringer = SceneManager.Create<DeathBringer>();
+    deathBringer._transform._position = new Vector2(8800, 530);
+    deathBringer._effects = SpriteEffects.FlipHorizontally;
+    deathBringer.CreateCollider();
+    SceneManager.Add(new EnemyHealthBar(deathBringer));
+    section4.Enemies.Add(deathBringer);
+
+    float gateY = 700f;
+    float gateScale = 1.5f;
+
+    var section1LeftGate = new Sprite("TerrainMidgroundTree");
+    section1LeftGate._transform._position = new Vector2(80, gateY);
+    section1LeftGate._transform._scale = new Vector2(gateScale);
+    section1LeftGate._color = Color.White;
+    section1.Blockers.Add(section1LeftGate);
+    SceneManager.Add(section1LeftGate);
+
+    var section1RightGate = new Sprite("TerrainMidgroundTree");
+    section1RightGate._transform._position = new Vector2(sectionWidth - 120, gateY);
+    section1RightGate._transform._scale = new Vector2(gateScale);
+    section1RightGate._color = Color.White;
+    section1.Blockers.Add(section1RightGate);
+    SceneManager.Add(section1RightGate);
+
+    var section2LeftGate = new Sprite("TerrainMidgroundTree");
+    section2LeftGate._transform._position = new Vector2(sectionWidth + 80, gateY);
+    section2LeftGate._transform._scale = new Vector2(gateScale);
+    section2LeftGate._color = Color.White;
+    section2.Blockers.Add(section2LeftGate);
+    SceneManager.Add(section2LeftGate);
+
+    var section2RightGate = new Sprite("TerrainMidgroundTree");
+    section2RightGate._transform._position = new Vector2(sectionWidth * 2 - 120, gateY);
+    section2RightGate._transform._scale = new Vector2(gateScale);
+    section2RightGate._color = Color.White;
+    section2.Blockers.Add(section2RightGate);
+    SceneManager.Add(section2RightGate);
+
+    var section3LeftGate = new Sprite("TerrainMidgroundTree");
+    section3LeftGate._transform._position = new Vector2(sectionWidth * 2 + 80, gateY);
+    section3LeftGate._transform._scale = new Vector2(gateScale);
+    section3LeftGate._color = Color.White;
+    section3.Blockers.Add(section3LeftGate);
+    SceneManager.Add(section3LeftGate);
+
+    var section3RightGate = new Sprite("TerrainMidgroundTree");
+    section3RightGate._transform._position = new Vector2(sectionWidth * 3 - 120, gateY);
+    section3RightGate._transform._scale = new Vector2(gateScale);
+    section3RightGate._color = Color.White;
+    section3.Blockers.Add(section3RightGate);
+    SceneManager.Add(section3RightGate);
+
+    var section4LeftGate = new Sprite("TerrainMidgroundTree");
+    section4LeftGate._transform._position = new Vector2(sectionWidth * 3 + 80, gateY);
+    section4LeftGate._transform._scale = new Vector2(gateScale);
+    section4LeftGate._color = Color.White;
+    section4.Blockers.Add(section4LeftGate);
+    SceneManager.Add(section4LeftGate);
+
+    var section4RightGate = new Sprite("TerrainMidgroundTree");
+    section4RightGate._transform._position = new Vector2(sectionWidth * 4 - 120, gateY);
+    section4RightGate._transform._scale = new Vector2(gateScale);
+    section4RightGate._color = Color.White;
+    section4.Blockers.Add(section4RightGate);
+    SceneManager.Add(section4RightGate);
+
+    section1.Lock();
+    section2.Lock();
+    section3.Lock();
+    section4.Lock();
+}
 }
