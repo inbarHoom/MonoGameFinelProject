@@ -155,6 +155,21 @@ public class Game1 : Game
        deathBringer.CreateCollider();
        SceneManager.Add(new EnemyHealthBar(deathBringer));
        
+       var fantasyWarrior = SceneManager.Create<FantasyWarrior>();
+       fantasyWarrior._transform._position = new Vector2(900, 530);
+       fantasyWarrior.CreateCollider();
+       SceneManager.Add(new EnemyHealthBar(fantasyWarrior));
+
+       var king = SceneManager.Create<King>();
+       king._transform._position = new Vector2(1100, 530);
+       king.CreateCollider();
+       SceneManager.Add(new EnemyHealthBar(king));
+
+       var knight = SceneManager.Create<Knight>();
+       knight._transform._position = new Vector2(1400, 530);
+       knight.CreateCollider();
+       SceneManager.Add(new EnemyHealthBar(knight));
+       
        var chest = SceneManager.Create<Chest>();
        chest._transform._position = new Vector2(450, 695); 
        chest.CreateCollider();
