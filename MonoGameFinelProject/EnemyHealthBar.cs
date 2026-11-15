@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 namespace MonoGameFinelProject;
 
 public class EnemyHealthBar : IDrawable, IUpdatable
@@ -13,8 +14,11 @@ public class EnemyHealthBar : IDrawable, IUpdatable
     private const int SourceHeight = 3;
     private const float BarWidth = 90f;
     private const float BarHeight = 8f;
-    private const float GapAboveEnemy = 2f;
-
+    private const float GapAboveEnemy = 30f;
+    private const float FramePaddingX = 5f;
+    private const float FramePaddingY = 4f;
+    private const float TrailFollowSpeed = 3f;
+    private float trailRatio = 1f;
     public EnemyHealthBar(Enemy enemy)
     {
         _enemy = enemy;
@@ -33,22 +37,34 @@ public class EnemyHealthBar : IDrawable, IUpdatable
         if (_enemy.MaxHealth <= 0)
             return;
 
+       
         float healthRatio = MathHelper.Clamp((float)_enemy.CurrentHealth / _enemy.MaxHealth, 0f, 1f);
 
+        float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        float blend = 1f - MathF.Exp(-TrailFollowSpeed * dt);
+        trailRatio = MathHelper.Lerp(trailRatio, healthRatio, blend);
+        
         float x = _enemy._rect.Center.X - BarWidth / 2f;
         float y = _enemy._rect.Top - GapAboveEnemy - BarHeight;
 
-        Vector2 position = new Vector2(x, y);
+        //Vector2 position = new Vector2(x, y);
         Vector2 fullScale = new Vector2(BarWidth / SourceWidth, BarHeight / SourceHeight);
 
-        _background._transform._position = position;
-        _background._transform._scale = fullScale;
+        _background._transform._position = new Vector2(x,y);
+        _background._transform._scale = new Vector2(fullScale.X * trailRatio, fullScale.Y);;
 
-        _fill._transform._position = position;
-        _fill._transform._scale = new Vector2(
-            fullScale.X * healthRatio,
-            fullScale.Y);
+        _fill._transform._position = new Vector2(x,y);;
+        _fill._transform._scale = new Vector2(fullScale.X * healthRatio, fullScale.Y);
 
+        _frame._transform._position = new Vector2(x - FramePaddingX, y - FramePaddingY);
+        float frameWidth = BarWidth + FramePaddingX * 2f;
+        float frameHeight = BarHeight + FramePaddingY * 2f;
+
+        _frame._transform._scale = new Vector2(
+            frameWidth / _frame._texture.Width,
+            frameHeight / _frame._texture.Height);
+
+        
         _background.Update(gameTime);
         _fill.Update(gameTime);
     }

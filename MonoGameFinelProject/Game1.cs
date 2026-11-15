@@ -99,20 +99,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("MimicTransform", "SpriteSheets/Mimic/transform",1,7);
         SpriteManager.AddSprite("MimicWalk", "SpriteSheets/Mimic/walk",1,6);
 // DeathBringer
-        for (int i = 1; i <= 10; i++)
-            SpriteManager.AddSprite($"DeathBringerAttack{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Attack_{i}");
-        for (int i = 1; i <= 9; i++)
-            SpriteManager.AddSprite($"DeathBringerCast{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Cast_{i}");
-        for (int i = 1; i <= 10; i++)
-            SpriteManager.AddSprite($"DeathBringerDeath{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Death_{i}");
-        for (int i = 1; i <= 3; i++)
-            SpriteManager.AddSprite($"DeathBringerHurt{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Hurt_{i}");
-        for (int i = 1; i <= 8; i++)
-            SpriteManager.AddSprite($"DeathBringerIdle{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Idle_{i}");
-        for (int i = 1; i <= 16; i++)
-            SpriteManager.AddSprite($"DeathBringerSpell{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Spell_{i}");
-        for (int i = 1; i <= 8; i++)
-            SpriteManager.AddSprite($"DeathBringerWalk{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Walk_{i}");
+      
 // FantasyWarrior
         SpriteManager.AddSprite("FantasyWarriorAttack1", "SpriteSheets/FantasyWarrior/Attack1");
         SpriteManager.AddSprite("FantasyWarriorAttack2", "SpriteSheets/FantasyWarrior/Attack2");

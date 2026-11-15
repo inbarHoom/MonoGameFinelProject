@@ -14,7 +14,7 @@ public class Chest : Animation
         WaitingForMimicDeath,
         Opened
     }
-    private const double MimicChance = 0.5;
+    private const double MimicChance = 0.8;
     private e_ChestState _state = e_ChestState.Closed;
     private bool _lootSpawned;
     private Collider interactCollider;
