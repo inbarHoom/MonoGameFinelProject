@@ -150,6 +150,11 @@ public class Game1 : Game
        goblin.CreateCollider(); 
        SceneManager.Add(new EnemyHealthBar(goblin));
        
+       var deathBringer = SceneManager.Create<DeathBringer>();
+       deathBringer._transform._position = new Vector2(1200, 530);
+       deathBringer.CreateCollider();
+       SceneManager.Add(new EnemyHealthBar(deathBringer));
+       
        var chest = SceneManager.Create<Chest>();
        chest._transform._position = new Vector2(450, 695); 
        chest.CreateCollider();
