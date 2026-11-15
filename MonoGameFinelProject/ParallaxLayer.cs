@@ -8,13 +8,15 @@ public class ParallaxLayer : IDrawable
     private readonly float _y;
     private readonly float _scale;
     private readonly float _parallax;
+    private readonly float? _bottomY;
 
-    public ParallaxLayer(string spriteName, float y, float scale, float parallax)
+    public ParallaxLayer(string spriteName, float y, float scale, float parallax,  float? bottomY = null)
     {
         _texture = SpriteManager.GetSprite(spriteName).texture;
         _y = y;
         _scale = scale;
         _parallax = parallax;
+        _bottomY = bottomY;
     }
 
     public void Draw(SpriteBatch spriteBatch)
@@ -22,9 +24,11 @@ public class ParallaxLayer : IDrawable
         float tileWidth = _texture.Width * _scale;
         float tileHeight = _texture.Height * _scale;
 
-        if (tileWidth <= 0f)
+        if (tileWidth <= 0f || tileHeight <= 0f)
             return;
 
+        float drawY = _bottomY.HasValue ? _bottomY.Value - tileHeight : _y;
+        
         float offset = Camera2D.Position.X * _parallax;
         float firstX = -(offset % tileWidth);
 
