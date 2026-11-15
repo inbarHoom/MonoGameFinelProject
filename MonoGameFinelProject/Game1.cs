@@ -53,6 +53,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("BarUI", "UI/ui_front_border5");
         SpriteManager.AddSprite("ItemSlot", "UI/ui_select_item3");
         SpriteManager.AddSprite("PickupIcon", "UI/Icon3");
+        SpriteManager.AddSprite("EnemyHealthFrame", "UI/boss_health_frame");
         
         SpriteManager.AddSprite("KeyboardABC", "UI/kb_dark_alphanumeric");
         SpriteManager.AddSprite("KeyboardSymbols", "UI/kb_dark_symbols");
@@ -97,6 +98,44 @@ public class Game1 : Game
         SpriteManager.AddSprite("MimicIdle", "SpriteSheets/Mimic/idle_transformed",1,9);
         SpriteManager.AddSprite("MimicTransform", "SpriteSheets/Mimic/transform",1,7);
         SpriteManager.AddSprite("MimicWalk", "SpriteSheets/Mimic/walk",1,6);
+// DeathBringer
+        for (int i = 1; i <= 10; i++)
+            SpriteManager.AddSprite($"DeathBringerAttack{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Attack_{i}");
+        for (int i = 1; i <= 9; i++)
+            SpriteManager.AddSprite($"DeathBringerCast{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Cast_{i}");
+        for (int i = 1; i <= 10; i++)
+            SpriteManager.AddSprite($"DeathBringerDeath{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Death_{i}");
+        for (int i = 1; i <= 3; i++)
+            SpriteManager.AddSprite($"DeathBringerHurt{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Hurt_{i}");
+        for (int i = 1; i <= 8; i++)
+            SpriteManager.AddSprite($"DeathBringerIdle{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Idle_{i}");
+        for (int i = 1; i <= 16; i++)
+            SpriteManager.AddSprite($"DeathBringerSpell{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Spell_{i}");
+        for (int i = 1; i <= 8; i++)
+            SpriteManager.AddSprite($"DeathBringerWalk{i}", $"SpriteSheets/DeathBringer/Bringer-of-Death_Walk_{i}");
+// FantasyWarrior
+        SpriteManager.AddSprite("FantasyWarriorAttack1", "SpriteSheets/FantasyWarrior/Attack1");
+        SpriteManager.AddSprite("FantasyWarriorAttack2", "SpriteSheets/FantasyWarrior/Attack2");
+        SpriteManager.AddSprite("FantasyWarriorAttack3", "SpriteSheets/FantasyWarrior/Attack3");
+        SpriteManager.AddSprite("FantasyWarriorDeath", "SpriteSheets/FantasyWarrior/Death");
+        SpriteManager.AddSprite("FantasyWarriorIdle", "SpriteSheets/FantasyWarrior/Idle");
+        SpriteManager.AddSprite("FantasyWarriorRun", "SpriteSheets/FantasyWarrior/Run");
+        SpriteManager.AddSprite("FantasyWarriorHit", "SpriteSheets/FantasyWarrior/Take hit");
+// King
+        SpriteManager.AddSprite("KingAttack1", "SpriteSheets/King/Attack1");
+        SpriteManager.AddSprite("KingAttack2", "SpriteSheets/King/Attack2");
+        SpriteManager.AddSprite("KingAttack3", "SpriteSheets/King/Attack3");
+        SpriteManager.AddSprite("KingDeath", "SpriteSheets/King/Death");
+        SpriteManager.AddSprite("KingIdle", "SpriteSheets/King/Idle");
+        SpriteManager.AddSprite("KingRun", "SpriteSheets/King/Run");
+        SpriteManager.AddSprite("KingHit", "SpriteSheets/King/Take Hit - white silhouette");
+// Knight
+        SpriteManager.AddSprite("KnightAttack1", "SpriteSheets/Knight/Attack1");
+        SpriteManager.AddSprite("KnightAttack2", "SpriteSheets/Knight/Attack2");
+        SpriteManager.AddSprite("KnightDeath", "SpriteSheets/Knight/Death");
+        SpriteManager.AddSprite("KnightIdle", "SpriteSheets/Knight/Idle");
+        SpriteManager.AddSprite("KnightRun", "SpriteSheets/Knight/Run");
+        SpriteManager.AddSprite("KnightHit", "SpriteSheets/Knight/Take Hit");
         
         Init();
     }
@@ -122,6 +161,7 @@ public class Game1 : Game
        
        player.CreateCollider();
        goblin.CreateCollider(); 
+       SceneManager.Add(new EnemyHealthBar(goblin));
        
        var chest = SceneManager.Create<Chest>();
        chest._transform._position = new Vector2(450, 695); 

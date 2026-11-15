@@ -90,7 +90,7 @@ public class Chest : Animation
         mimic.DeathAnimationFinished += OnMimicDeathAnimationFinished;
         mimic.BeginTransform();
         mimic.CreateCollider();
-
+        SceneManager.Add(new EnemyHealthBar(mimic));
         _state = e_ChestState.WaitingForMimicDeath;
     }
     private void OnMimicDeathAnimationFinished(Mimic mimic)

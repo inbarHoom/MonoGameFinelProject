@@ -35,6 +35,9 @@ public  class Enemy : Animation , IDamagable
     protected bool targetInRange;
     protected bool targetInView;
     
+    public int CurrentHealth => _health.Current;
+    public int MaxHealth => _health.Maximum;
+    public bool IsDead => _state == e_EnemyState.Death;
     protected Enemy(string SpriteName, int maxHealth) : base(SpriteName)
     {
         _health = new Health(maxHealth);
