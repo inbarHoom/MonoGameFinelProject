@@ -36,7 +36,7 @@ public class ParallaxLayer : IDrawable
         {
             var destination = new Rectangle(
                 (int)x,
-                (int)_y,
+                (int)drawY,
                 (int)tileWidth,
                 (int)tileHeight);
 

@@ -145,11 +145,16 @@ public class Game1 : Game
         SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
         SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.12f));
         SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 420, 1f, 0.25f));
+        SceneManager.Add(new ParallaxLayer(
+            "TerrainGround",
+            y: 900,
+            scale: 0.3f,       // Reduce this if the ground tile looks too large.
+            parallax: 1f));
         SpawnLevel();
         var floor = new Sprite("Pixel");
-        floor._transform._position = new Vector2(0, 900);
+        floor._transform._position = new Vector2(0, 940);
         floor._transform._scale = new Vector2(LevelWidth, 20);
-        floor._color = Color.Yellow;
+        floor._color = Color.Transparent;
         SceneManager.Add(floor);
 
         var floorCollider = new Collider
@@ -165,7 +170,7 @@ public class Game1 : Game
         _player._transform._position = new Vector2(180, 500);
        
        
-        SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 0.45f, 0.6f, 900f));
+       // SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 0.45f, 0.6f, 900f));
         SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 0.85f , 1080));
         
       /*var goblin = SceneManager.Create<Goblin>();

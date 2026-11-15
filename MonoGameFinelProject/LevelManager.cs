@@ -34,15 +34,27 @@ public class LevelManager
         if (CurrentSection == null)
             return;
 
-        float minX = CurrentSection.Left + 80f;
-        float maxX = CurrentSection.Right - 80f;
+        bool sectionCleared = CurrentSection.IsCleared();
 
-        float clampedX = MathHelper.Clamp(player._transform._position.X, minX, maxX);
-        player._transform._position = new Vector2(clampedX, player._transform._position.Y);
-
-        if (CurrentSection.IsCleared())
+        if (sectionCleared)
+        {
             CurrentSection.Unlock();
+        }
         else
+        {
             CurrentSection.Lock();
+
+            float minX = CurrentSection.Left + 80f;
+            float maxX = CurrentSection.Right - 80f;
+
+            float clampedX = MathHelper.Clamp(
+                player._transform._position.X,
+                minX,
+                maxX);
+
+            player._transform._position = new Vector2(
+                clampedX,
+                player._transform._position.Y);
+        }
     }
 }
