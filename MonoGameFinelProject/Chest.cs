@@ -149,7 +149,7 @@ public class Chest : Animation
         for (int i = 0; i < itemIds.Length; i++)
         {
             Item item = ItemFactory.Create(itemIds[i]);
-            item._transform._position = _transform._position + new Vector2(145 + i * 50, 175);
+            item._transform._position = _transform._position + new Vector2(145 + i * 70, 175);
             SceneManager.Add(item);
             item.CreateCollider();
         }

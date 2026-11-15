@@ -53,6 +53,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
         player.InventoryCycled += OnInventoryCycled;
     }
 
+    // shows the pickedup item in the ui
     private void OnPlayerPickedUpItem(Item item)
     {
         if(item == null || item.ItemType == Item.e_ItemType.Coin) return;

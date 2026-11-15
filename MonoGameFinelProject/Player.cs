@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -202,15 +203,13 @@ public class Player : Animation, IDamagable, IHealable
 
         bool facingLeft = (_effects & SpriteEffects.FlipHorizontally) != SpriteEffects.None;
 
-        // Spawn position near the player's hand/chest based on facing direction
         float handOffsetX = facingLeft ? 80f : 190f;
         float handOffsetY = 90f;
         Vector2 handPos = _transform._position + new Vector2(handOffsetX, handOffsetY);
         Vector2 bombStart = handPos - new Vector2(50f, 50f);
 
         Bomb bomb = SceneManager.Create<Bomb>();
-
-        // Aim 320 pixels in front of the player in the direction they are facing
+        
         float throwDistance = 320f;
         float targetX = bombStart.X + (facingLeft ? -throwDistance : throwDistance);
         Vector2 bombTarget = new Vector2(
@@ -286,22 +285,38 @@ public class Player : Animation, IDamagable, IHealable
     }
     private void TryInteract()
     {
-        for (int i = 0; i < SceneManager.colliders.Count; i++)
+        if (BodyCollider == null)
+            return;
+        
+        foreach (Collider collider in SceneManager.colliders)
         {
-            Sprite parent = SceneManager.colliders[i].Parent;
-
-            if (parent is Chest chest && chest.PlayerInRange)
+            if (collider.IsEnabled &&
+                collider.Parent is Chest chest &&
+                chest.PlayerInRange)
             {
                 chest.Open();
                 return;
             }
-
-            if (parent is Item item && item.PlayerInRange)
-            {
-                item.TryPickup(this);
-                return;
-            }
         }
+
+        List<Item> itemsToPickup = new();
+        
+        foreach (Collider collider in SceneManager.colliders)
+        {
+            
+            if (collider.IsEnabled &&
+                collider.Parent is Item pickupItem &&
+                pickupItem.IsInPickupRange(this))
+                {
+                    itemsToPickup.Add(pickupItem);
+                }
+        }
+        foreach (Item item in itemsToPickup)
+        {
+            Debug.WriteLine($"Calling TryPickup: {item.ItemID}");
+            item.TryPickup(this);
+        }
+       
     }
     private void CycleInventory(int direction)
     {

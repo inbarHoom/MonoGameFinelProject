@@ -213,7 +213,7 @@ public class Game1 : Game
        
         _player.ItemPickedUp += item =>
         {
-            if (item.ItemID == "Gold_Coins")
+            if (item.ItemID == "Gold_Coins" || item.ItemType == Item.e_ItemType.Coin)
             {
                 int totalCoins = _player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
                 coinCount._text = totalCoins.ToString();

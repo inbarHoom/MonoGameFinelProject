@@ -23,6 +23,9 @@ public class Item : Sprite , IPickupable , ISellable
     private int itemPrice { get; set; }
     private int itemQuantity { get; set; }
     private string itemID {get;set;}
+ 
+    public float MinPickupGapPixels { get; set; } = 0f;
+    public float MaxPickupGapPixels { get; set; } = 40f;
     
     public string ItemName
     {
@@ -74,8 +77,7 @@ public class Item : Sprite , IPickupable , ISellable
     {
         SpriteName = SpritenName;
         _transform._scale = new Vector2(1.5f);
-
-        // Flickering 'E' key prompt above top-left of the item
+        
         ePrompt = new KeyboardPrompt(
             Keys.E,
             new Rectangle(0, 64, 16, 16),
@@ -123,7 +125,7 @@ public class Item : Sprite , IPickupable , ISellable
             {
                 Collider other = SceneManager.colliders[i];
                 if (other.IsEnabled && other.colliderType == Collider.e_ColliderType.Body &&
-                    other.Parent is Player && pickupCollider._rect.Intersects(other._rect))
+                    other.Parent is Player && other.Parent is Player player && IsInPickupRange(player))
                 {
                     PlayerInRange = true;
                     break;
@@ -156,6 +158,30 @@ public class Item : Sprite , IPickupable , ISellable
         }
         SceneManager.Remove(this);
         return true;
+    }
+    public bool IsInPickupRange(Player player)
+    {
+        if (player == null || player.BodyCollider == null ||
+            pickupCollider == null || !pickupCollider.IsEnabled)
+        {
+            return false;
+        }
+
+        Rectangle body = player.BodyCollider._rect;
+        Rectangle item = pickupCollider._rect;
+        float dx = item.Left > body.Right ? item.Left - body.Right
+            : body.Left > item.Right ? body.Left - item.Right
+            : 0f;
+
+        float dy = item.Top > body.Bottom ? item.Top - body.Bottom
+            : body.Top > item.Bottom ? body.Top - item.Bottom
+            : 0f;
+        float distanceSquared = dx * dx + dy * dy;
+        float minSquared = MinPickupGapPixels * MinPickupGapPixels;
+        float maxSquared = MaxPickupGapPixels * MaxPickupGapPixels;
+
+        return distanceSquared >= minSquared &&
+               distanceSquared <= maxSquared;
     }
 
     public void Sell(Item item)

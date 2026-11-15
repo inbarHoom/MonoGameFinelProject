@@ -114,6 +114,14 @@ public class Collider : Sprite
     {
         if(!IsEnabled || !showDebugOutline) return;
     #if DEBUG
+        
+        Rectangle bounds = _rect;
+        if (Parent != null && Parent.UseCamera)
+        {
+            bounds.Offset(
+                -(int)Camera2D.Position.X,
+                -(int)Camera2D.Position.Y);
+        }
         // draw outline bounds
         int thickness = 5;
 
@@ -146,9 +154,9 @@ public class Collider : Sprite
         // top
         spriteBatch.Draw(_texture,
             new Rectangle(
-                _rect.X,
-                _rect.Y,
-                _rect.Width,
+                bounds.X,
+                bounds.Y,
+                bounds.Width,
                 thickness
             ), 
             color);
@@ -156,29 +164,29 @@ public class Collider : Sprite
         // left
         spriteBatch.Draw(_texture,
             new Rectangle(
-                _rect.X,
-                _rect.Y,
+                bounds.X,
+                bounds.Y,
                 thickness,
-                _rect.Height
+                bounds.Height
             ), 
             color);
         
         // right
         spriteBatch.Draw(_texture,
             new Rectangle(
-                _rect.X + _rect.Width - thickness,
-                _rect.Y,
+                bounds.X + bounds.Width - thickness,
+                bounds.Y,
                 thickness,
-                _rect.Height
+                bounds.Height
             ), 
             color);
         
         // bottom
         spriteBatch.Draw(_texture,
             new Rectangle(
-                _rect.X,
-                _rect.Y + _rect.Height - thickness,
-                _rect.Width,
+                bounds.X,
+                bounds.Y + bounds.Height - thickness,
+                bounds.Width,
                 thickness
             ), 
             color);
