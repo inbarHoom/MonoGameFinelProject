@@ -65,7 +65,7 @@ public class Player : Animation, IDamagable, IHealable
     private const float LightAttackStaminaCost = 1f;
     private const float HeavyAttackStaminaCost = 2f;
     private const float JumpStaminaCost = StaminaCapacity * 0.20f;
-    private const float StaminaRegenDelay = 3f;
+    private const float StaminaRegenDelay = 1f;
     private const float StaminaRegenPerSecond = 1f;
     public float CurrentStamina { get; private set; } = StaminaCapacity;
     public float MaxStamina => StaminaCapacity;

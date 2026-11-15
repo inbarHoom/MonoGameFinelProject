@@ -10,7 +10,7 @@ public class ChestLootTable
     {
         int roll = Random.Next(65); // 0 through 64
 
-        if (roll < 20)
+        if (roll < 30)
             return "Bomb_Pickup";
 
         if (roll < 40)
