@@ -99,7 +99,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("MimicTransform", "SpriteSheets/Mimic/transform",1,7);
         SpriteManager.AddSprite("MimicWalk", "SpriteSheets/Mimic/walk",1,6);
 // DeathBringer
-      
+        SpriteManager.AddSprite("DeathBringerSheet", "SpriteSheets/DeathBringer/Bringer-of-Death-SpritSheet", 8, 8);
 // FantasyWarrior
         SpriteManager.AddSprite("FantasyWarriorAttack1", "SpriteSheets/FantasyWarrior/Attack1");
         SpriteManager.AddSprite("FantasyWarriorAttack2", "SpriteSheets/FantasyWarrior/Attack2");
