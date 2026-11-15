@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 namespace MonoGameFinelProject;
 
 public class DeathBringer : Enemy
@@ -24,7 +25,7 @@ public class DeathBringer : Enemy
     {
         speed = 140f;
         _transform._scale = Vector2.One * 2f;
-
+        _effects = SpriteEffects.FlipHorizontally;
         PlayDeathBringerAnimation(IdleClip, e_EnemyState.Idle);
     }
     private void PlayDeathBringerAnimation(
@@ -41,7 +42,7 @@ public class DeathBringer : Enemy
             Parent = this,
             IsEnabled = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 75, 75, 80),
+            LocalBounds = new Rectangle(170, 70, 100, 115),
             colliderType = Collider.e_ColliderType.Body
         };
         bodyCollider.onCollision += OnGroundCollision;
@@ -53,7 +54,7 @@ public class DeathBringer : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(145, 80, 45, 70),
+            LocalBounds = new Rectangle(80, 80, 100, 95),
             colliderType = Collider.e_ColliderType.Attack
         };
         attackCollider.onTrigger += OnAttackTrigger;
@@ -65,7 +66,7 @@ public class DeathBringer : Enemy
             IsEnabled = true,
             isTrigger = true,
             UseCustomBounds = true,
-            LocalBounds = new Rectangle(70, 97, 220, 20),
+            LocalBounds = new Rectangle(-50, 80, 300, 20),
             colliderType = Collider.e_ColliderType.Vision
         };
         visionCollider.onTrigger += OnVisionTrigger;
@@ -87,11 +88,17 @@ public class DeathBringer : Enemy
             return;
 
         base.TakeDamage(amount);
-
-        // base.TakeDamage calls Die() at zero health.
-        // Don't replace the death animation with the hurt animation.
+        
         if (!IsDead)
             PlayDeathBringerAnimation(HurtClip, e_EnemyState.Hit);
+    }
+    public override void FaceTarget(Player player)
+    {
+        if (player == null) return;
+
+        _effects = player._transform._position.X < _transform._position.X
+            ? SpriteEffects.None
+            : SpriteEffects.FlipHorizontally;
     }
 
     protected override void Die()

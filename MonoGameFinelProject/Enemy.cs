@@ -81,7 +81,7 @@ public  class Enemy : Animation , IDamagable
         isGrounded = true;
     }
 
-    public void FaceTarget(Player player)
+    public virtual void FaceTarget(Player player)
     {
         if (player == null) return;
 
