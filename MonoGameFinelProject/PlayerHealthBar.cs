@@ -15,7 +15,9 @@ public class PlayerHealthBar : Sprite
     {
         this.player = player;
         fullScale = uiScale;
-
+        UseCamera = false;
+       
+        
         var barCrop = new Rectangle(31, 8, 71, 3);
         _sourceRectangle = barCrop;
 
@@ -24,6 +26,7 @@ public class PlayerHealthBar : Sprite
         damageTrail._sourceRectangle = barCrop;
         damageTrail._transform._position = _transform._position;
         damageTrail._transform._scale = new Vector2(uiScale, uiScale);
+        damageTrail.UseCamera = false;
     }
 
     public override void Update(GameTime gameTime)

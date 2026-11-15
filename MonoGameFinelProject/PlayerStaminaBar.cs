@@ -12,6 +12,7 @@ public class PlayerStaminaBar : Sprite
         this.player = player;
         fullScale = uiScale;
 
+        UseCamera = false;
         _sourceRectangle = new Rectangle(31, 8, 71, 3);
         _transform._position =
             framePosition + new Vector2(31 * uiScale, 18 * uiScale);

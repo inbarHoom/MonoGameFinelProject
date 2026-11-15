@@ -144,11 +144,12 @@ public class Game1 : Game
         SceneManager.Add(floorCollider);
         
        var player = SceneManager.Create<Player>();
-      //var goblin = SceneManager.Create<Goblin>();
+       
+      var goblin = SceneManager.Create<Goblin>();
        
        player.CreateCollider();
-       //goblin.CreateCollider(); 
-     //  SceneManager.Add(new EnemyHealthBar(goblin));
+       goblin.CreateCollider(); 
+       SceneManager.Add(new EnemyHealthBar(goblin));
        
        var deathBringer = SceneManager.Create<DeathBringer>();
        deathBringer._transform._position = new Vector2(1200, 530);
@@ -187,21 +188,21 @@ public class Game1 : Game
        staminaBackground._transform._position =
            new Vector2(uiX + 31 * uiScale, uiY + 18 * uiScale);
        staminaBackground._transform._scale = new Vector2(uiScale, uiScale);
-       SceneManager.Add(staminaBackground);
+       AddHudSprite(staminaBackground);
 
-       SceneManager.Add(new PlayerStaminaBar(player, new Vector2(uiX, uiY), uiScale));
+       AddHudSprite(new PlayerStaminaBar(player, new Vector2(uiX, uiY), uiScale));
        
        var barUI = new Sprite("BarUI");
        barUI._transform._position = new Vector2(uiX, uiY);
        barUI._transform._scale = new Vector2(uiScale, uiScale);
-       SceneManager.Add(barUI);
+       AddHudSprite(barUI);
        
        var coinIcon = new Sprite("Money");
        coinIcon._transform._position = new Vector2(
            uiX + 31 * uiScale,
            uiY + 32 * uiScale -10);
        coinIcon._transform._scale = new Vector2(1.2f);
-       SceneManager.Add(coinIcon);
+       AddHudSprite(coinIcon);
        
        Text coinCount = new Text();
         coinCount._transform._position = new Vector2(
@@ -243,41 +244,41 @@ public class Game1 : Game
        var leftSlot = new Sprite("ItemSlot");
        leftSlot._transform._position = new Vector2(leftSlotX, slotY);
        leftSlot._transform._scale = new Vector2(itemSlotScale);
-       SceneManager.Add(leftSlot);
+       AddHudSprite(leftSlot);
 
        var rightSlot = new Sprite("ItemSlot");
        rightSlot._transform._position = new Vector2(rightSlotX, slotY);
        rightSlot._transform._scale = new Vector2(itemSlotScale);
-       SceneManager.Add(rightSlot);
+       AddHudSprite(rightSlot);
        
        var pickupSlot = new Sprite("ItemSlot");
        pickupSlot._transform._position = new Vector2(pickupSlotX, slotY);
        pickupSlot._transform._scale = new Vector2(itemSlotScale);
-       SceneManager.Add(pickupSlot);
+       AddHudSprite(pickupSlot);
        
        var inventorySlot = new Sprite("ItemSlot");
        inventorySlot._transform._position = new Vector2(inventorySlotX, slotY);
        inventorySlot._transform._scale = new Vector2(itemSlotScale);
-       SceneManager.Add(inventorySlot);
+       AddHudSprite(inventorySlot);
        
        SceneManager.Add(new InventorySlotUI(player, new Vector2(inventorySlotX, slotY), slotSize, dungeonFont));
 
        var lightIcon = new Sprite("LightAttackUI");
        lightIcon._transform._position= new Vector2(leftSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        lightIcon._transform._scale = new Vector2(iconScale);
-       SceneManager.Add(lightIcon);
+       AddHudSprite(lightIcon);
 
        var heavyIcon = new Sprite("HeavyAttackUI");
        heavyIcon._transform._position = new Vector2(rightSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        heavyIcon._transform._scale = new Vector2(iconScale);
-       SceneManager.Add(heavyIcon);
+       AddHudSprite(heavyIcon);
 
        float pickupIconScale = iconSize / 32f;
        
        var pickupIcon = new Sprite("PickupIcon");
        pickupIcon._transform._position = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        pickupIcon._transform._scale = new Vector2(pickupIconScale);
-       SceneManager.Add(pickupIcon);
+       AddHudSprite(pickupIcon);
        
        Vector2 lightIconPosition = new Vector2(
            leftSlotX + (slotWidth - iconSize) / 2, 
@@ -304,45 +305,52 @@ public class Game1 : Game
            (int)MathF.Round(heavyIconPosition.X + keyOffset.X),
            (int)MathF.Round(heavyIconPosition.Y + keyOffset.Y));
        
-       SceneManager.Add(new KeyboardPrompt(
+       var lightKeyPrompt = new KeyboardPrompt(
            Keys.J,
            new Rectangle(0, 144, 16, 16), // J released
            new Rectangle(16, 144, 16, 16), // J held
            lightKeyPosition,
-           keyScale));
-
-       SceneManager.Add(new KeyboardPrompt(
+           keyScale);
+       AddHudSprite(lightKeyPrompt);
+       var heavyPrompt  = new KeyboardPrompt(
            Keys.K,
            new Rectangle(0, 160, 16, 16), // K released
            new Rectangle(16, 160, 16, 16), // K held
            heavyKeyPosition,
-           keyScale));
+           keyScale);
+       AddHudSprite(heavyPrompt);
+      
        
-       SceneManager.Add(new KeyboardPrompt(
+       var pickupPrompt =new KeyboardPrompt(
            Keys.E,
            new Rectangle(0, 64, 16, 16), // E released
            new Rectangle(16, 64, 16, 16), // E held
            pickupSlotPosition + keyOffset,
-           keyScale));
+           keyScale);
+       AddHudSprite(pickupPrompt);
 
-       SceneManager.Add(new KeyboardPrompt(
+       var interactPrompt =new KeyboardPrompt(
            Keys.F,
            new Rectangle(0, 80, 16, 16), // F released
            new Rectangle(16, 80, 16, 16), // F held
            inventorySlotPosition + keyOffset,
-           keyScale));
-       SceneManager.Add(new KeyboardPrompt( 1,
+           keyScale);
+       AddHudSprite(interactPrompt);
+       
+      var invLeft =new KeyboardPrompt( 1,
            Keys.OemComma,
            new Rectangle(0, 270, 16, 16), // < released
            new Rectangle(16, 270, 16, 16),  // < pressed
            new Vector2(inventorySlot._transform._position.X + keyOffset.X - 25,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
-           ,keyScale)); 
-       SceneManager.Add(new KeyboardPrompt( 1,
+           ,keyScale); 
+      AddHudSprite(invLeft);
+       var invRight = new KeyboardPrompt( 1,
            Keys.OemPeriod,
            new Rectangle(0, 254, 16, 16), // < released
            new Rectangle(16, 254, 16, 16),  // < pressed
            new Vector2(inventorySlot._transform._position.X - keyOffset.X + 60,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
-           ,keyScale)); 
+           ,keyScale); 
+       AddHudSprite(invRight);
     }
     
     protected override void Update(GameTime gameTime)
@@ -365,5 +373,10 @@ public class Game1 : Game
         
         _spriteBatch.End();
         base.Draw(gameTime);
+    }
+    private static void AddHudSprite(Sprite sprite)
+    {
+        sprite.UseCamera = false;
+        SceneManager.Add(sprite);
     }
 }

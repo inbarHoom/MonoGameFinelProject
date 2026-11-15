@@ -10,6 +10,8 @@ public class Sprite : IDrawable , IUpdatable
     public int sortingLayer { get; set; } = 0;
     public SpriteEffects _effects { get; set; } = SpriteEffects.None;
     private Rectangle source; 
+    public bool UseCamera { get; set; } = true;
+    
     public Rectangle _sourceRectangle
     {
         get
@@ -35,9 +37,12 @@ public class Sprite : IDrawable , IUpdatable
     public virtual void Draw(SpriteBatch spriteBatch)
     {
         if (_texture == null) return;
+        Vector2 drawPosition = UseCamera
+            ? _transform._position - Camera2D.Position
+            : _transform._position;
         
         spriteBatch.Draw(_texture,
-            _transform._position, 
+            drawPosition, 
             _sourceRectangle,
             _color,
             MathHelper.ToRadians(_transform._rotation),

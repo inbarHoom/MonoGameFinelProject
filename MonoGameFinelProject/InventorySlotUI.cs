@@ -27,13 +27,13 @@ public class InventorySlotUI : IDrawable, IUpdatable
         this.slotPosition = slotPosition;
         this.slotSize = slotSize;
         this.font = font;
-
+        
         tinyCoinIcon = new Sprite("Money");
         tinyCoinIcon._transform._scale = new Vector2(0.45f);
         tinyCoinIcon._transform._position = new Vector2(
             slotPosition.X + 10,
             slotPosition.Y + slotSize - 25);
-
+        tinyCoinIcon.UseCamera = false;
         priceText = new Text
         {
             _font = font,
@@ -104,6 +104,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
         itemIcon._transform._position = new Vector2(
             slotPosition.X + (slotSize - targetIconSize) / 2f,
             slotPosition.Y + (slotSize - targetIconSize) / 2f - 6f);
+        itemIcon.UseCamera = false;
     }
 
     public void Update(GameTime gameTime)
