@@ -76,10 +76,7 @@ public class SceneManager : IUpdatable , IDrawable
             updatables[i].Update(gameTime);
         }
         
-        /*foreach (IUpdatable updatable in updatables)
-        {
-            updatable.Update(gameTime);
-        }*/
+      
     }
 
     public void Draw(SpriteBatch spriteBatch)

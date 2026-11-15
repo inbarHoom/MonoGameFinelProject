@@ -9,6 +9,7 @@ public class Game1 : Game
     public const float LevelWidth = 9600f;
     private Player _player;
     private readonly LevelManager _levelManager = new();
+    private const float FloorY = 1100;
     
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
@@ -161,7 +162,6 @@ public class Game1 : Game
         {
             Parent = floor,
             colliderType = Collider.e_ColliderType.Ground,
-            showDebugOutline = true
         };
         SceneManager.Add(floorCollider);
         
@@ -173,35 +173,6 @@ public class Game1 : Game
        // SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 0.45f, 0.6f, 900f));
         SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 0.85f , 1080));
         
-      /*var goblin = SceneManager.Create<Goblin>();
-       goblin.CreateCollider(); 
-       SceneManager.Add(new EnemyHealthBar(goblin));
-       
-       var deathBringer = SceneManager.Create<DeathBringer>();
-       deathBringer._transform._position = new Vector2(1200, 530);
-       deathBringer.CreateCollider();
-       SceneManager.Add(new EnemyHealthBar(deathBringer));
-       
-       var fantasyWarrior = SceneManager.Create<FantasyWarrior>();
-       fantasyWarrior._transform._position = new Vector2(900, 530);
-       fantasyWarrior.CreateCollider();
-       SceneManager.Add(new EnemyHealthBar(fantasyWarrior));
-
-       var king = SceneManager.Create<King>();
-       king._transform._position = new Vector2(1100, 530);
-       king.CreateCollider();
-       SceneManager.Add(new EnemyHealthBar(king));
-
-       var knight = SceneManager.Create<Knight>();
-       knight._transform._position = new Vector2(1400, 530);
-       knight.CreateCollider();
-       SceneManager.Add(new EnemyHealthBar(knight));
-       
-       var chest = SceneManager.Create<Chest>();
-       chest._transform._position = new Vector2(450, 695); 
-       chest.CreateCollider();*/
-       
-       
        // HUD
        const float uiScale = 3.5f;
        const int uiX = 15;
@@ -407,7 +378,7 @@ public class Game1 : Game
 
     // ---- SECTION 1 ----
     var chest1 = SceneManager.Create<Chest>();
-    chest1._transform._position = new Vector2(1200, 695);
+    PlaceChest(chest1, 1200);
     chest1.CreateCollider();
     section1.Chests.Add(chest1);
 
@@ -450,18 +421,18 @@ public class Game1 : Game
     section2.Enemies.Add(knight1);
 
     var chest2 = SceneManager.Create<Chest>();
-    chest2._transform._position = new Vector2(4500, 695);
+    PlaceChest(chest2, 4500);
     chest2.CreateCollider();
     section2.Chests.Add(chest2);
 
     // ---- SECTION 3 ----
     var chest3 = SceneManager.Create<Chest>();
-    chest3._transform._position = new Vector2(5400, 695);
+    PlaceChest(chest3, 5400);
     chest3.CreateCollider();
     section3.Chests.Add(chest3);
 
     var chest4 = SceneManager.Create<Chest>();
-    chest4._transform._position = new Vector2(5800, 695);
+    PlaceChest(chest4, 5800);
     chest4.CreateCollider();
     section3.Chests.Add(chest4);
 
@@ -497,65 +468,16 @@ public class Game1 : Game
     float gateY = 700f;
     float gateScale = 1.5f;
 
-    var section1LeftGate = new Sprite("TerrainMidgroundTree");
-    section1LeftGate._transform._position = new Vector2(80, gateY);
-    section1LeftGate._transform._scale = new Vector2(gateScale);
-    section1LeftGate._color = Color.White;
-    section1.Blockers.Add(section1LeftGate);
-    SceneManager.Add(section1LeftGate);
-
-    var section1RightGate = new Sprite("TerrainMidgroundTree");
-    section1RightGate._transform._position = new Vector2(sectionWidth - 120, gateY);
-    section1RightGate._transform._scale = new Vector2(gateScale);
-    section1RightGate._color = Color.White;
-    section1.Blockers.Add(section1RightGate);
-    SceneManager.Add(section1RightGate);
-
-    var section2LeftGate = new Sprite("TerrainMidgroundTree");
-    section2LeftGate._transform._position = new Vector2(sectionWidth + 80, gateY);
-    section2LeftGate._transform._scale = new Vector2(gateScale);
-    section2LeftGate._color = Color.White;
-    section2.Blockers.Add(section2LeftGate);
-    SceneManager.Add(section2LeftGate);
-
-    var section2RightGate = new Sprite("TerrainMidgroundTree");
-    section2RightGate._transform._position = new Vector2(sectionWidth * 2 - 120, gateY);
-    section2RightGate._transform._scale = new Vector2(gateScale);
-    section2RightGate._color = Color.White;
-    section2.Blockers.Add(section2RightGate);
-    SceneManager.Add(section2RightGate);
-
-    var section3LeftGate = new Sprite("TerrainMidgroundTree");
-    section3LeftGate._transform._position = new Vector2(sectionWidth * 2 + 80, gateY);
-    section3LeftGate._transform._scale = new Vector2(gateScale);
-    section3LeftGate._color = Color.White;
-    section3.Blockers.Add(section3LeftGate);
-    SceneManager.Add(section3LeftGate);
-
-    var section3RightGate = new Sprite("TerrainMidgroundTree");
-    section3RightGate._transform._position = new Vector2(sectionWidth * 3 - 120, gateY);
-    section3RightGate._transform._scale = new Vector2(gateScale);
-    section3RightGate._color = Color.White;
-    section3.Blockers.Add(section3RightGate);
-    SceneManager.Add(section3RightGate);
-
-    var section4LeftGate = new Sprite("TerrainMidgroundTree");
-    section4LeftGate._transform._position = new Vector2(sectionWidth * 3 + 80, gateY);
-    section4LeftGate._transform._scale = new Vector2(gateScale);
-    section4LeftGate._color = Color.White;
-    section4.Blockers.Add(section4LeftGate);
-    SceneManager.Add(section4LeftGate);
-
-    var section4RightGate = new Sprite("TerrainMidgroundTree");
-    section4RightGate._transform._position = new Vector2(sectionWidth * 4 - 120, gateY);
-    section4RightGate._transform._scale = new Vector2(gateScale);
-    section4RightGate._color = Color.White;
-    section4.Blockers.Add(section4RightGate);
-    SceneManager.Add(section4RightGate);
-
-    section1.Lock();
-    section2.Lock();
-    section3.Lock();
-    section4.Lock();
+   
 }
+    private static void PlaceChest(Chest chest, float worldX)
+    {
+        float chestHeight =
+            chest._sourceRectangle.Height * chest._transform._scale.Y;
+
+        chest._transform._position =
+            new Vector2(worldX, FloorY - chestHeight);
+
+        chest.CreateCollider();
+    }
 }

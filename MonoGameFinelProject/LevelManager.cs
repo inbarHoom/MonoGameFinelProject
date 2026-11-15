@@ -16,6 +16,9 @@ public class LevelManager
 
     public void Update(Player player)
     {
+        
+        if (player == null)
+            return;
         CurrentSection = null;
 
         foreach (LevelSection section in _sections)
@@ -31,30 +34,16 @@ public class LevelManager
             }
         }
 
-        if (CurrentSection == null)
+        if (CurrentSection == null || CurrentSection.IsCleared())
             return;
+        const float boundaryInset = 80f;
 
-        bool sectionCleared = CurrentSection.IsCleared();
+        float minX = CurrentSection.Left + boundaryInset;
+        float maxX = CurrentSection.Right - boundaryInset;
 
-        if (sectionCleared)
-        {
-            CurrentSection.Unlock();
-        }
-        else
-        {
-            CurrentSection.Lock();
-
-            float minX = CurrentSection.Left + 80f;
-            float maxX = CurrentSection.Right - 80f;
-
-            float clampedX = MathHelper.Clamp(
-                player._transform._position.X,
-                minX,
-                maxX);
-
-            player._transform._position = new Vector2(
-                clampedX,
-                player._transform._position.Y);
-        }
+        Vector2 position = player._transform._position;
+        position.X = MathHelper.Clamp(position.X, minX, maxX);
+        player._transform._position = position;
+   
     }
 }

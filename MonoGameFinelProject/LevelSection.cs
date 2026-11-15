@@ -9,7 +9,6 @@ public class LevelSection
 
     public List<Enemy> Enemies { get; } = new();
     public List<Chest> Chests { get; } = new();
-    public List<Sprite> Blockers { get; } = new();
 
     public LevelSection(float left, float right)
     {
@@ -30,22 +29,5 @@ public class LevelSection
 
         return true;
     }
-
-    public void Unlock()
-    {
-        foreach (Sprite blocker in Blockers)
-        {
-            blocker._color = Color.Transparent;
-            //blocker.IsVisible = false; // if you add this property to Sprite
-        }
-    }
-
-    public void Lock()
-    {
-        foreach (Sprite blocker in Blockers)
-        {
-            blocker._color = Color.White;
-           // blocker.IsVisible = true;
-        }
-    }
+    
 }
