@@ -156,6 +156,11 @@ public class Game1 : Game
        SpriteManager.AddSprite("TerrainMidgroundTree", "Terrain/tree_cluster_midground1");
        SpriteManager.AddSprite("TerrainForegroundTrees", "Terrain/tree_cluster_foreground1");
        SpriteManager.AddSprite("TerrainForegroundFoliage", "Terrain/foliage_cluster_foreground1");
+       
+       SpriteManager.AddSprite("Campfire", "SpriteSheets/Decoration/Campfire sheet", 8, 5);
+       SpriteManager.AddSprite("CampfireWithFood", "SpriteSheets/Decoration/Campfire with food sheet", 8, 5);
+       SpriteManager.AddSprite("SmallTent", "SpriteSheets/Decoration/Small Tent");
+       SpriteManager.AddSprite("DecorAtlas", "SpriteSheets/Decoration/Decor");
         
         Init();
     }
@@ -186,7 +191,7 @@ public class Game1 : Game
         _player._transform._position = new Vector2(180, 500);
        
        
-       // SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 0.45f, 0.6f, 900f));
+     
         SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
         
        // HUD
@@ -414,31 +419,21 @@ public class Game1 : Game
     _levelManager.AddSection(section4);
     _levelManager.AddSection(section5);
     _levelManager.AddSection(section6);
-    _levelManager.AddSection(section7);
-
-    // Section 1: unchanged
+    _levelManager.AddSection(section7); 
+// chests
+    // Section 1: 3 goblins
     var chest1 = SceneManager.Create<Chest>();
     PlaceChest(chest1, 1200);
     section1.Chests.Add(chest1);
-
-    SpawnEnemy<Goblin>(section1, 700, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section1, 1600);
-    SpawnEnemy<Goblin>(section1, 1900);
-
-    // Section 2: existing spawns plus two Goblins
-    SpawnEnemy<Goblin>(section2, 3000);
-    SpawnEnemy<Knight>(section2, 3550);
-
-    SpawnEnemy<Goblin>(section2, 2650, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section2, 4100, SpriteEffects.None);
-
+    
+    // Section 2: three Goblins and knight
     var chest2 = SceneManager.Create<Chest>();
     PlaceChest(chest2, 4500);
     section2.Chests.Add(chest2);
 
     // Section 3: intentionally empty
 
-    // Section 4: original Section 3 contents plus three Goblins and one Knight
+    // Section 4: three Goblins two Knight and fantasy warrior
     var chest3 = SceneManager.Create<Chest>();
     PlaceChest(chest3, 7400);
     section4.Chests.Add(chest3);
@@ -446,25 +441,10 @@ public class Game1 : Game
     var chest4 = SceneManager.Create<Chest>();
     PlaceChest(chest4, 7750);
     section4.Chests.Add(chest4);
-
-    SpawnEnemy<Goblin>(section4, 8050, SpriteEffects.None);
-    SpawnEnemy<Knight>(section4, 8320);
-    SpawnEnemy<Goblin>(section4, 8590);
-    SpawnEnemy<Knight>(section4, 8860);
-    SpawnEnemy<FantasyWarrior>(section4, 9130);
-    SpawnEnemy<Goblin>(section4, 9400, SpriteEffects.None);
-
+    
     // Section 5: intentionally empty
 
     // Section 6
-    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section6, 12550);
-    SpawnEnemy<Knight>(section6, 12850);
-    SpawnEnemy<FantasyWarrior>(section6, 13000);
-    SpawnEnemy<Goblin>(section6, 14000);
-    SpawnEnemy<Knight>(section6, 13700);
-    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
-
     var chest5 = SceneManager.Create<Chest>();
     PlaceChest(chest5, 13200);
     section6.Chests.Add(chest5);
@@ -477,11 +457,51 @@ public class Game1 : Game
     var chest7 = SceneManager.Create<Chest>();
     PlaceChest(chest7, 14500);
     section7.Chests.Add(chest7);
+    
+    var campsites = new CampsiteGenerator();
 
-    SpawnEnemy<King>(section7, 14800);
-    SpawnEnemy<DeathBringer>(section7, 16400);
-
-   
+    foreach (var section in new[]
+                 { section1, section2, section3, section4, section5, section6, section7 })
+    {
+        campsites.GenerateInSection(section, 940f, 2);
+    }
+// enemies
+    // section 1
+    SpawnEnemy<Goblin>(section1, 700, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section1, 1600);
+    SpawnEnemy<Goblin>(section1, 1900);
+    // section 2
+    SpawnEnemy<Goblin>(section2, 3000);
+    SpawnEnemy<Knight>(section2, 3550);
+    SpawnEnemy<Goblin>(section2, 2650, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section2, 4100, SpriteEffects.None);
+    // section 3
+    
+    // section 4
+    SpawnEnemy<Goblin>(section4, 8050, SpriteEffects.None);
+    SpawnEnemy<Knight>(section4, 8320);
+    SpawnEnemy<Goblin>(section4, 8590);
+    SpawnEnemy<Knight>(section4, 8860);
+    SpawnEnemy<FantasyWarrior>(section4, 9130);
+    SpawnEnemy<Goblin>(section4, 9400, SpriteEffects.None);
+    // section 5
+    
+    // section 6
+    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section6, 12550);
+    SpawnEnemy<Knight>(section6, 12850);
+    SpawnEnemy<FantasyWarrior>(section6, 13000);
+    SpawnEnemy<Goblin>(section6, 14000);
+    SpawnEnemy<Knight>(section6, 13700);
+    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
+    // section 7
+    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section6, 12550);
+    SpawnEnemy<Knight>(section6, 12850);
+    SpawnEnemy<FantasyWarrior>(section6, 13000);
+    SpawnEnemy<Goblin>(section6, 14000);
+    SpawnEnemy<Knight>(section6, 13700);
+    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
 }
     private static void PlaceChest(Chest chest, float worldX)
     {
