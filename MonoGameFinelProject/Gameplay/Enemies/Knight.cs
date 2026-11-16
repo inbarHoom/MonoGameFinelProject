@@ -95,7 +95,10 @@ public class Knight : Enemy
         base.TakeDamage(amount);
 
         if (!IsDead)
+        {
             StartEnemyAnimation(Hit, e_EnemyState.Hit, false, 8);
+            AudioManager.PlaySoundEffect("HitArmor", false,0.5f);
+        }
     }
 
     protected override void Die()

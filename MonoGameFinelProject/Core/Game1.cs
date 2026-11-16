@@ -6,7 +6,7 @@ namespace MonoGameFinelProject;
 
 public class Game1 : Game
 {
-    public const float LevelWidth = 9600f;
+    public const float LevelWidth = 16800f;
     private Player _player;
     private readonly LevelManager _levelManager = new();
     private const float FloorY = 1100;
@@ -163,14 +163,10 @@ public class Game1 : Game
     void Init()
     {
         AudioManager.PlaySong("Journey" , true , 0.1f);
-        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
-        SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.12f));
-        SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 420, 1f, 0.25f));
-        SceneManager.Add(new ParallaxLayer(
-            "TerrainGround",
-            y: 900,
-            scale: 0.3f,       // Reduce this if the ground tile looks too large.
-            parallax: 1f));
+        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0.1f));
+        SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
+        SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
+        SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1f));
         SpawnLevel();
         var floor = new Sprite("Pixel");
         floor._transform._position = new Vector2(0, 940);
@@ -191,7 +187,7 @@ public class Game1 : Game
        
        
        // SceneManager.Add(new ParallaxLayer("TerrainForegroundTrees", 620, 0.45f, 0.6f, 900f));
-        SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 0.85f , 1080));
+        SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
         
        // HUD
        const float uiScale = 3.5f;
@@ -245,7 +241,6 @@ public class Game1 : Game
        const float iconScale = 0.3f;
        const int bottomMargin = 24;
        const int leftMargin = 60;
-       const int slotGap = 10;
 
        float slotWidth = 32 * itemSlotScale;   
        float slotHeight = 32 * itemSlotScale;
@@ -383,111 +378,108 @@ public class Game1 : Game
         sprite.UseCamera = false;
         SceneManager.Add(sprite);
     }
-    private void SpawnLevel()
-{
-    const float sectionWidth = LevelManager.SectionWidth;
+    
+    private static T SpawnEnemy<T>(
+        LevelSection section,
+        float worldX,
+        SpriteEffects effects = SpriteEffects.FlipHorizontally)
+        where T : Enemy, new()
+    {
+        var enemy = SceneManager.Create<T>();
+        enemy._transform._position = new Vector2(worldX, 530);
+        enemy._effects = effects;
+        enemy.CreateCollider();
+
+        SceneManager.Add(new EnemyHealthBar(enemy));
+        section.Enemies.Add(enemy);
+
+        return enemy;
+    }
+    
+    private void SpawnLevel() 
+    {
+   const float sectionWidth = LevelManager.SectionWidth;
 
     var section1 = new LevelSection(0, sectionWidth);
     var section2 = new LevelSection(sectionWidth, sectionWidth * 2);
     var section3 = new LevelSection(sectionWidth * 2, sectionWidth * 3);
     var section4 = new LevelSection(sectionWidth * 3, sectionWidth * 4);
+    var section5 = new LevelSection(sectionWidth * 4, sectionWidth * 5);
+    var section6 = new LevelSection(sectionWidth * 5, sectionWidth * 6);
+    var section7 = new LevelSection(sectionWidth * 6, sectionWidth * 7);
 
     _levelManager.AddSection(section1);
     _levelManager.AddSection(section2);
     _levelManager.AddSection(section3);
     _levelManager.AddSection(section4);
+    _levelManager.AddSection(section5);
+    _levelManager.AddSection(section6);
+    _levelManager.AddSection(section7);
 
-    // ---- SECTION 1 ----
+    // Section 1: unchanged
     var chest1 = SceneManager.Create<Chest>();
     PlaceChest(chest1, 1200);
-    chest1.CreateCollider();
     section1.Chests.Add(chest1);
 
-  
-    var goblin1 = SceneManager.Create<Goblin>();
-    goblin1._transform._position = new Vector2(700, 530);
-    goblin1._effects = SpriteEffects.None;
-    goblin1.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(goblin1));
-    section1.Enemies.Add(goblin1);
+    SpawnEnemy<Goblin>(section1, 700, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section1, 1600);
+    SpawnEnemy<Goblin>(section1, 1900);
 
-   
-    var goblin2 = SceneManager.Create<Goblin>();
-    goblin2._transform._position = new Vector2(1600, 530);
-    goblin2._effects = SpriteEffects.FlipHorizontally;
-    goblin2.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(goblin2));
-    section1.Enemies.Add(goblin2);
+    // Section 2: existing spawns plus two Goblins
+    SpawnEnemy<Goblin>(section2, 3000);
+    SpawnEnemy<Knight>(section2, 3550);
 
-    var goblin3 = SceneManager.Create<Goblin>();
-    goblin3._transform._position = new Vector2(1900, 530);
-    goblin3._effects = SpriteEffects.FlipHorizontally;
-    goblin3.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(goblin3));
-    section1.Enemies.Add(goblin3);
-
-    // ---- SECTION 2 ----
-    var goblin4 = SceneManager.Create<Goblin>();
-    goblin4._transform._position = new Vector2(3000, 530);
-    goblin4._effects = SpriteEffects.FlipHorizontally;
-    goblin4.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(goblin4));
-    section2.Enemies.Add(goblin4);
-
-    var knight1 = SceneManager.Create<Knight>();
-    knight1._transform._position = new Vector2(3550, 530);
-    knight1._effects = SpriteEffects.FlipHorizontally;
-    knight1.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(knight1));
-    section2.Enemies.Add(knight1);
+    SpawnEnemy<Goblin>(section2, 2650, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section2, 4100, SpriteEffects.None);
 
     var chest2 = SceneManager.Create<Chest>();
     PlaceChest(chest2, 4500);
-    chest2.CreateCollider();
     section2.Chests.Add(chest2);
 
-    // ---- SECTION 3 ----
+    // Section 3: intentionally empty
+
+    // Section 4: original Section 3 contents plus three Goblins and one Knight
     var chest3 = SceneManager.Create<Chest>();
-    PlaceChest(chest3, 5400);
-    chest3.CreateCollider();
-    section3.Chests.Add(chest3);
+    PlaceChest(chest3, 7400);
+    section4.Chests.Add(chest3);
 
     var chest4 = SceneManager.Create<Chest>();
-    PlaceChest(chest4, 5800);
-    chest4.CreateCollider();
-    section3.Chests.Add(chest4);
+    PlaceChest(chest4, 7750);
+    section4.Chests.Add(chest4);
 
-    var knight2 = SceneManager.Create<Knight>();
-    knight2._transform._position = new Vector2(6300, 530);
-    knight2._effects = SpriteEffects.FlipHorizontally;
-    knight2.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(knight2));
-    section3.Enemies.Add(knight2);
+    SpawnEnemy<Goblin>(section4, 8050, SpriteEffects.None);
+    SpawnEnemy<Knight>(section4, 8320);
+    SpawnEnemy<Goblin>(section4, 8590);
+    SpawnEnemy<Knight>(section4, 8860);
+    SpawnEnemy<FantasyWarrior>(section4, 9130);
+    SpawnEnemy<Goblin>(section4, 9400, SpriteEffects.None);
 
-    var fantasyWarrior = SceneManager.Create<FantasyWarrior>();
-    fantasyWarrior._transform._position = new Vector2(6700, 530);
-    fantasyWarrior._effects = SpriteEffects.FlipHorizontally;
-    fantasyWarrior.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(fantasyWarrior));
-    section3.Enemies.Add(fantasyWarrior);
+    // Section 5: intentionally empty
 
-    // ---- SECTION 4 ----
-    var king = SceneManager.Create<King>();
-    king._transform._position = new Vector2(8200, 530);
-    king._effects = SpriteEffects.FlipHorizontally;
-    king.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(king));
-    section4.Enemies.Add(king);
+    // Section 6
+    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section6, 12550);
+    SpawnEnemy<Knight>(section6, 12850);
+    SpawnEnemy<FantasyWarrior>(section6, 13000);
+    SpawnEnemy<Goblin>(section6, 14000);
+    SpawnEnemy<Knight>(section6, 13700);
+    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
 
-    var deathBringer = SceneManager.Create<DeathBringer>();
-    deathBringer._transform._position = new Vector2(8800, 530);
-    deathBringer._effects = SpriteEffects.FlipHorizontally;
-    deathBringer.CreateCollider();
-    SceneManager.Add(new EnemyHealthBar(deathBringer));
-    section4.Enemies.Add(deathBringer);
+    var chest5 = SceneManager.Create<Chest>();
+    PlaceChest(chest5, 13200);
+    section6.Chests.Add(chest5);
 
-    float gateY = 700f;
-    float gateScale = 1.5f;
+    var chest6 = SceneManager.Create<Chest>();
+    PlaceChest(chest6, 13400);
+    section6.Chests.Add(chest6);
+
+    // Section 7: King and chest near the start; Death Bringer near the end
+    var chest7 = SceneManager.Create<Chest>();
+    PlaceChest(chest7, 14500);
+    section7.Chests.Add(chest7);
+
+    SpawnEnemy<King>(section7, 14800);
+    SpawnEnemy<DeathBringer>(section7, 16400);
 
    
 }
