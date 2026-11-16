@@ -18,7 +18,7 @@ public class ChestLootTable
 
         if (roll < 55)
             return Random.Next(2) == 0 ? "Goblin_Hand" : "Goblin_Foot";
-        if (roll < 80)
+        if (roll < 25)
             return Random.Next(2) == 0 ? "Health_Potion" : "Stamina_Potion";
 
         return "Gold_Coins";

@@ -197,17 +197,6 @@ public class Bomb : Animation , IThrowable
         {
             BeginExplosion();
         }
-        /*
-        if ((state == e_BombState.AtTarget || state == e_BombState.Landed) &&
-            CurrentFrame >= BombFramesBeforeExplosion)
-        {
-            BeginExplosion();
-            if (isFinished)
-            {
-                
-            }
-        }
-        */
         if (state == e_BombState.Flying &&
             CurrentFrame >= BombFramesBeforeExplosion)
         {
