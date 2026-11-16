@@ -8,9 +8,9 @@ public class Coins : Item
         ItemDescription = "10 coins of gold";
         ItemType = e_ItemType.Coin;
         IsSellable = true;
-        ItemPrice = 10;
+        ItemPrice = 1;
 
-        ItemQuantity = 1;
+        ItemQuantity = 10;
         ItemID = "Gold_Coins";
     }
 }

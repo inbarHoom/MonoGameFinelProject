@@ -74,10 +74,12 @@ public class Player : Animation, IDamagable, IHealable
     // inventory
     private readonly PlayerInventory _inventory = new();
     public PlayerInventory Inventory => _inventory;
+    public MerchantShopSystem MerchantShop { get; set; }
     // key prompt
     private KeyboardPrompt comboKPrompt;
     public string DisplayedInventoryItemId { get;  set; }
     public event Action<Item> ItemPickedUp;
+    public event Action<int> WalletChanged;
 
     public event Action<int> InventoryCycled;
     
@@ -371,6 +373,12 @@ public class Player : Animation, IDamagable, IHealable
     {
         InventoryCycled?.Invoke(direction);
     }
+
+    public void NotifyWalletChanged()
+    {
+        WalletChanged?.Invoke(_inventory.GetQuantity("Gold_Coins"));
+    }
+
       public override void Update(GameTime gameTime)
     {
         KeyboardState keyboard = Keyboard.GetState();
@@ -382,7 +390,8 @@ public class Player : Animation, IDamagable, IHealable
         bool jumpPressed = WasPressed(keyboard, Keys.Space);
         if (WasPressed(keyboard, Keys.E))
         {
-            TryInteract();
+            if (MerchantShop == null || !MerchantShop.TryBuyNearby())
+                TryInteract();
         }
         if (WasPressed(keyboard, Keys.Z))
         {
@@ -391,7 +400,10 @@ public class Player : Animation, IDamagable, IHealable
 
         if (WasPressed(keyboard, Keys.F))
         {
-            TryUseEquippedItem();
+            if (MerchantShop != null && MerchantShop.IsNearMerchant())
+                MerchantShop.TrySellHeldItem();
+            else
+                TryUseEquippedItem();
         }
         if (WasPressed(keyboard, Keys.OemComma) || WasPressed(keyboard, Keys.Left))
         {
@@ -525,6 +537,8 @@ public class Player : Animation, IDamagable, IHealable
     {
         if (item == null) return;
         DisplayedInventoryItemId = item.ItemID;
+        if (item.ItemType == Item.e_ItemType.Coin)
+            NotifyWalletChanged();
         ItemPickedUp?.Invoke(item);
     }
 }

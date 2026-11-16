@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
 namespace MonoGameFinelProject;
 
 public class Game1 : Game
@@ -9,6 +10,7 @@ public class Game1 : Game
     public const float LevelWidth = 16800f;
     private Player _player;
     private readonly LevelManager _levelManager = new();
+    private readonly List<MerchantSiteInfo> _merchantSites = new();
     private const float FloorY = 1100;
     
     private GraphicsDeviceManager _graphics;
@@ -100,6 +102,8 @@ public class Game1 : Game
         SpriteManager.AddSprite("MartialHeroFall", "SpriteSheets/MartialHero/Fall", 1, 2);
         SpriteManager.AddSprite("MartialHeroHit", "SpriteSheets/MartialHero/Take Hit - white silhouette", 1, 4);
         SpriteManager.AddSprite("MartialHeroDeath", "SpriteSheets/MartialHero/Death", 1, 6);
+// Allies
+        SpriteManager.AddSprite("Merchant", "SpriteSheets/Merchant/Idle", 1, 8);
 // Bomb
         SpriteManager.AddSprite("Bomb", "SpriteSheets/Goblin/Bomb_sprite", 1, 19);
 // Enemies:
@@ -190,9 +194,14 @@ public class Game1 : Game
         _player.CreateCollider();
         _player._transform._position = new Vector2(180, 500);
        
-       
-     
         SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
+
+        var merchantShop = new MerchantShopSystem(
+            _player,
+            dungeonFont,
+            _merchantSites);
+        _player.MerchantShop = merchantShop;
+        SceneManager.Add(merchantShop);
         
        // HUD
        const float uiScale = 3.5f;
@@ -232,14 +241,16 @@ public class Game1 : Game
         coinCount._text = "0";
         SceneManager.Add(coinCount);
        
+        _player.WalletChanged += balance =>
+        {
+            coinCount._text = balance.ToString();
+        };
+        _player.NotifyWalletChanged();
+
         _player.ItemPickedUp += item =>
         {
-            if (item.ItemID == "Gold_Coins" || item.ItemType == Item.e_ItemType.Coin)
-            {
-                AudioManager.PlaySoundEffect("CoinUp",false,0.5f);
-                int totalCoins = _player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
-                coinCount._text = totalCoins.ToString();
-            }
+            if (item.ItemType == Item.e_ItemType.Coin)
+                AudioManager.PlaySoundEffect("CoinUp", false, 0.5f);
         };
         
        const float itemSlotScale = 3f;
@@ -391,7 +402,13 @@ public class Game1 : Game
         where T : Enemy, new()
     {
         var enemy = SceneManager.Create<T>();
-        enemy._transform._position = new Vector2(worldX, 530);
+        float enemyWidth =
+            enemy._sourceRectangle.Width * enemy._transform._scale.X;
+        float safeWorldX = MathHelper.Clamp(
+            worldX,
+            section.Left,
+            section.Right - enemyWidth);
+        enemy._transform._position = new Vector2(safeWorldX, 530);
         enemy._effects = effects;
         enemy.CreateCollider();
 
@@ -453,7 +470,7 @@ public class Game1 : Game
     PlaceChest(chest6, 13400);
     section6.Chests.Add(chest6);
 
-    // Section 7: King and chest near the start; Death Bringer near the end
+    // Section 7: chest near the start
     var chest7 = SceneManager.Create<Chest>();
     PlaceChest(chest7, 14500);
     section7.Chests.Add(chest7);
@@ -461,9 +478,17 @@ public class Game1 : Game
     var campsites = new CampsiteGenerator();
 
     foreach (var section in new[]
-                 { section1, section2, section3, section4, section5, section6, section7 })
+             { section1, section2, section3, section4, section5, section6, section7 })
     {
-        campsites.GenerateInSection(section, 940f, 2);
+        if (section == section3 || section == section5)
+        {
+            _merchantSites.Add(
+                campsites.GenerateMerchantCampsite(section, 940f));
+        }
+        else
+        {
+            campsites.GenerateInSection(section, 940f, 2);
+        }
     }
 // enemies
     // section 1
@@ -495,13 +520,16 @@ public class Game1 : Game
     SpawnEnemy<Knight>(section6, 13700);
     SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
     // section 7
-    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section6, 12550);
-    SpawnEnemy<Knight>(section6, 12850);
-    SpawnEnemy<FantasyWarrior>(section6, 13000);
-    SpawnEnemy<Goblin>(section6, 14000);
-    SpawnEnemy<Knight>(section6, 13700);
-    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section7, section7.Left + 400f, SpriteEffects.None);
+    SpawnEnemy<Goblin>(section7, section7.Left + 700f);
+    SpawnEnemy<Knight>(section7, section7.Left + 1000f);
+    SpawnEnemy<FantasyWarrior>(section7, section7.Left + 1300f);
+    SpawnEnemy<Goblin>(section7, section7.Left + 1600f);
+    SpawnEnemy<Knight>(section7, section7.Left + 1900f);
+    SpawnEnemy<King>(section7, section7.Left + 2250f, SpriteEffects.None);
+    SpawnEnemy<DeathBringer>(section7, section7.Left + 2370f, SpriteEffects.None);
+
+    
 }
     private static void PlaceChest(Chest chest, float worldX)
     {

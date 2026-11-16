@@ -14,7 +14,7 @@ public class EnemyHealthBar : IDrawable, IUpdatable
     private const int SourceHeight = 3;
     private const float BarWidth = 90f;
     private const float BarHeight = 8f;
-    private const float GapAboveEnemy = 30f;
+    private const float GapAboveEnemy = 0f;
     private const float FramePaddingX = 5f;
     private const float FramePaddingY = 4f;
     private const float TrailFollowSpeed = 3f;

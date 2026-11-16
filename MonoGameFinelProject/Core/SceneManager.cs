@@ -46,6 +46,25 @@ public class SceneManager : IUpdatable , IDrawable
             colliders.Add(collider);
         }
     }
+
+    public static void AddBefore<T>(T obj, IDrawable before) where T : IDrawable
+    {
+        if (obj is IUpdatable updatable)
+        {
+            updatables.Add(updatable);
+        }
+
+        int index = _drawables.IndexOf(before);
+        if (index < 0)
+            _drawables.Add(obj);
+        else
+            _drawables.Insert(index, obj);
+
+        if (obj is Collider collider)
+        {
+            colliders.Add(collider);
+        }
+    }
     
     public static void Remove<T>(T obj) where T : IDrawable
     {

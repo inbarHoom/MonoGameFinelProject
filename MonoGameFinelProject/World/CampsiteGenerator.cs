@@ -48,11 +48,40 @@ public sealed class CampsiteGenerator
         for (int i = 0; i < siteCount; i++)
         {
             float jitter = (float)(_random.NextDouble() * 2 - 1) * maxJitter;
-            float startX = firstX + i * SiteWidth + jitter;
+            float startX = firstX + i * spacing + jitter;
             if (OverlapsChest(startX, section.Chests))
                 continue;
             GenerateOne(startX, groundY);
         }
+    }
+
+    public MerchantSiteInfo GenerateMerchantCampsite(
+        LevelSection section,
+        float groundY)
+    {
+        float x = section.Left + (section.Right - section.Left - SiteWidth) / 2f;
+
+        if (OverlapsChest(x, section.Chests))
+        {
+            throw new InvalidOperationException(
+                "The merchant campsite overlaps a chest.");
+        }
+
+        AddAtlasProp(TentA, x, groundY, PropScale);
+
+        float tableX = x + 220f;
+        var table = new Sprite("DecorAtlas")
+        {
+            _sourceRectangle = Table
+        };
+        AddAtGround(table, tableX, groundY, new Vector2(4f, 2.5f));
+
+        AddAtlasProp(Stool, tableX + 130f, groundY, PropScale);
+        AddFire("CampfireWithFood", x + 660f, groundY);
+
+        return new MerchantSiteInfo(
+            new Vector2(x + 360f, groundY),
+            new Vector2(tableX, groundY));
     }
     
     private static bool OverlapsChest(float siteStartX, List<Chest> chests)
@@ -258,11 +287,24 @@ public sealed class CampsiteGenerator
         float groundY,
         float scale)
     {
-        sprite._transform._scale = new Vector2(scale);
+        AddAtGround(sprite, x, groundY, new Vector2(scale));
+    }
+
+    private static void AddAtGround(
+        Sprite sprite,
+        float x,
+        float groundY,
+        Vector2 scale)
+    {
+        sprite._transform._scale = scale;
         sprite._transform._position = new Vector2(
             x,
-            groundY - sprite._sourceRectangle.Height * scale);
+            groundY - sprite._sourceRectangle.Height * scale.Y);
 
         SceneManager.Add(sprite);
     }
 }
+
+public readonly record struct MerchantSiteInfo(
+    Vector2 MerchantGroundPosition,
+    Vector2 TableGroundPosition);
