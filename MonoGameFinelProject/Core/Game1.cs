@@ -43,8 +43,27 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteManager = new SpriteManager(Content);
-        _audioManager = new AudioManager(Content); 
+        _audioManager = new AudioManager(Content);
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+// Audio
+    // Music
+        AudioManager.AddSong( "ByTheRiver" ,"Audio/Music/Clement Panchout _ 2022 _ By the river");
+        AudioManager.AddSong( "Journey" ,"Audio/Music/Clement Panchout _ Journey _ 2017");
+    // SFX 
+        // General
+        AudioManager.AddSoundEffect("CoinUp", "Audio/SFX/dingDingDing");
+        AudioManager.AddSoundEffect("ChestOpen", "Audio/SFX/doorOpen");
+        AudioManager.AddSoundEffect("PickupItem", "Audio/SFX/pickUp");
+        // Player
+        AudioManager.AddSoundEffect("BombParry", "Audio/SFX/PlayerSFX/bombParry");
+        AudioManager.AddSoundEffect("HitArmor", "Audio/SFX/PlayerSFX/hitArmor");
+        AudioManager.AddSoundEffect("PlayerDeath", "Audio/SFX/PlayerSFX/playerDeath");
+        AudioManager.AddSoundEffect("LightAttack", "Audio/SFX/PlayerSFX/slash5");
+        AudioManager.AddSoundEffect("HeavyAttack", "Audio/SFX/PlayerSFX/slash6");
+        // Enemies
+        AudioManager.AddSoundEffect("GoblinAttack1", "Audio/SFX/EnemiesSFX/slash1");
+        AudioManager.AddSoundEffect("GoblinAttack2", "Audio/SFX/EnemiesSFX/slash2");
+        
 // UI
     // Fonts
         dungeonFont = Content.Load<SpriteFont>("Fonts/DungeonFont");
@@ -143,6 +162,7 @@ public class Game1 : Game
 
     void Init()
     {
+        AudioManager.PlaySong("Journey" , true , 0.1f);
         SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
         SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.12f));
         SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 420, 1f, 0.25f));
@@ -215,6 +235,7 @@ public class Game1 : Game
         {
             if (item.ItemID == "Gold_Coins" || item.ItemType == Item.e_ItemType.Coin)
             {
+                AudioManager.PlaySoundEffect("CoinUp",false,0.5f);
                 int totalCoins = _player.Inventory.GetQuantity("Gold_Coins") * item.ItemPrice;
                 coinCount._text = totalCoins.ToString();
             }

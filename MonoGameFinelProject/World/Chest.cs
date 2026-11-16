@@ -74,6 +74,7 @@ public class Chest : Animation
         }
         _state = e_ChestState.Opening;
         StartAnimation("ChestOpening", false,  6,  0);
+        AudioManager.PlaySoundEffect("ChestOpen",false,0.5f);
     }
 
     private void SpawnMimic()

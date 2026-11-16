@@ -185,6 +185,7 @@ public class Player : Animation, IDamagable, IHealable
     {
         _action = e_PlayerAction.Death;
         StartPlayerAnimation(Death, e_PlayerAction.Death,false,4);
+        AudioManager.PlaySoundEffect("PlayerDeath" , false , 0.5f);
     }
     private void TryUseEquippedItem()
     {
@@ -355,14 +356,14 @@ public class Player : Animation, IDamagable, IHealable
             if (collider.IsEnabled &&
                 collider.Parent is Item pickupItem &&
                 pickupItem.IsInPickupRange(this))
-                {
-                    itemsToPickup.Add(pickupItem);
-                }
+            {
+                itemsToPickup.Add(pickupItem);
+            }
         }
         foreach (Item item in itemsToPickup)
         {
-            Debug.WriteLine($"Calling TryPickup: {item.ItemID}");
             item.TryPickup(this);
+            AudioManager.PlaySoundEffect("PickupItem");
         }
        
     }
@@ -400,8 +401,7 @@ public class Player : Animation, IDamagable, IHealable
         {
             CycleInventory(1);
         }
-        if(WasPressed(keyboard,Keys.B)) TakeDamage(20);
-
+        
         Vector2 position = _transform._position;
 
         int horizontal = 0;
@@ -458,7 +458,10 @@ public class Player : Animation, IDamagable, IHealable
                 {
                     comboWindowOpen = false;
                     if(TrySpendStamina(HeavyAttackStaminaCost))
-                      StartPlayerAnimation(heavyAttack,e_PlayerAction.HeavyAttack,false,12);
+                    {
+                        StartPlayerAnimation(heavyAttack, e_PlayerAction.HeavyAttack, false, 12);
+                        AudioManager.PlaySoundEffect("HeavyAttack",false,0.5f);
+                    }
                 }
                 else
                 {
@@ -492,6 +495,7 @@ public class Player : Animation, IDamagable, IHealable
         else if (lightAtkPressed && TrySpendStamina(LightAttackStaminaCost))
         {
             StartPlayerAnimation(lightAttack, e_PlayerAction.LightAttack, false,  12,  0.05);
+            AudioManager.PlaySoundEffect("LightAttack",false,0.5f);
         }
         else
         {

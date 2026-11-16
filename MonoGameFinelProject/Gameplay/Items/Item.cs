@@ -157,6 +157,7 @@ public class Item : Sprite , IPickupable , ISellable
             SceneManager.Remove(pickupCollider);
         }
         SceneManager.Remove(this);
+        AudioManager.PlaySoundEffect("Pickup",false,0.5f);
         return true;
     }
     public bool IsInPickupRange(Player player)

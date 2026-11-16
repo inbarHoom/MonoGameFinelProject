@@ -139,6 +139,7 @@ public class Bomb : Animation , IThrowable
         arcHeight = 60f;
         state = e_BombState.Returning;
         PauseAnimation();
+        AudioManager.PlaySoundEffect("BombParry", false,0.5f);
         return true;
     }
     
