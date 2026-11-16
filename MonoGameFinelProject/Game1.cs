@@ -63,7 +63,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("KeyboardABC", "UI/kb_dark_alphanumeric");
         SpriteManager.AddSprite("KeyboardSymbols", "UI/kb_dark_symbols");
 // Items
-        SpriteManager.AddSprite("ItemsSheet", "SpriteSheets/Items/items 32x32");
+        SpriteManager.AddSprite("Potions", "SpriteSheets/Items/items 32x32" , 4 ,4);
         SpriteManager.AddSprite("GoblinToe", "SpriteSheets/Items/Icon2");
         SpriteManager.AddSprite("GoblinEar", "SpriteSheets/Items/Icon3");
         SpriteManager.AddSprite("GoblinHand", "SpriteSheets/Items/Icon5");

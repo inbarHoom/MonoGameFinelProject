@@ -12,6 +12,8 @@ public static class ItemFactory
             "Goblin_Hand" => new GoblinHand(),
             "Goblin_Foot" => new GoblinFoot(),
             "Gold_Coins"       => new Coins(),
+            "Health_Potion" => new HealthPotion(),
+            "Stamina_Potion" => new StaminaPotion(),
 
             _ => throw new System.ArgumentException(
                 $"Unknown item ID: {itemId}",

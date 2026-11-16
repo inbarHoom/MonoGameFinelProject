@@ -17,7 +17,7 @@ public class LevelManager
     public void Update(Player player)
     {
         
-        if (player == null)
+        if (player == null || _sections.Count == 0)
             return;
         CurrentSection = null;
 
@@ -34,12 +34,24 @@ public class LevelManager
             }
         }
 
-        if (CurrentSection == null || CurrentSection.IsCleared())
-            return;
+      
         const float boundaryInset = 80f;
 
-        float minX = CurrentSection.Left + boundaryInset;
-        float maxX = CurrentSection.Right - boundaryInset;
+        float playerWidth = player._sourceRectangle.Width * player._transform._scale.X;
+        float minX = _sections[0].Left + boundaryInset;
+        float maxX = _sections[_sections.Count - 1].Right - boundaryInset - playerWidth;
+
+        if (CurrentSection != null && !CurrentSection.IsCleared())
+        {
+            float sectionMinX = CurrentSection.Left + boundaryInset;
+            float sectionMaxX = CurrentSection.Right - boundaryInset;
+
+            if (sectionMinX > minX)
+                minX = sectionMinX;
+
+            if (sectionMaxX < maxX)
+                maxX = sectionMaxX;
+        }
 
         Vector2 position = player._transform._position;
         position.X = MathHelper.Clamp(position.X, minX, maxX);

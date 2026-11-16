@@ -10,9 +10,8 @@ public static class EnemyLootTable
     {
         ("Bomb_Pickup", 1),
         ("Gold_Coins", 1),
-
-        // Tomorrow, add potion IDs and weights here, for example:
-        // ("Potion_Health", 1),
+        ("Health_Potion", 1),
+        ("Stamina_Potion", 1),
     };
 
     public static string RollEliteDropItemId()

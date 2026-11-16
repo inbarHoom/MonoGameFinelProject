@@ -188,12 +188,35 @@ public class Player : Animation, IDamagable, IHealable
     }
     private void TryUseEquippedItem()
     {
-        if (DisplayedInventoryItemId != "Bomb_Pickup")
+        string itemId = DisplayedInventoryItemId;
+
+        if (string.IsNullOrEmpty(itemId))
             return;
 
-        if (_inventory.TryRemoveItem("Bomb_Pickup", 1))
+        switch (itemId)
         {
-            ThrowBomb();
+            case "Bomb_Pickup":
+                if (_inventory.TryRemoveItem(itemId, 1))
+                    ThrowBomb();
+                break;
+
+            case "Health_Potion":
+                if (_inventory.GetQuantity(itemId) > 0 &&
+                    TryHealFraction(HealthPotion.healFraction))
+                {
+                    _inventory.TryRemoveItem(itemId, 1);
+                }
+
+                break;
+
+            case "Stamina_Potion":
+                if (_inventory.GetQuantity(itemId) > 0 &&
+                    TryRestoreStaminaToFull())
+                {
+                    _inventory.TryRemoveItem(itemId, 1);
+                }
+
+                break;
         }
     }
     private void ThrowBomb()
@@ -221,6 +244,31 @@ public class Player : Animation, IDamagable, IHealable
     }
 
     public void Heal(int amount) => _health.Heal(amount);
+    
+    private bool TryHealFraction(float fraction)
+    {
+        if (_action == e_PlayerAction.Death || fraction <= 0f || CurrentHealth >= MaxHealth)
+        {
+            return false;
+        }
+
+        int amount = Math.Max(1, (int)Math.Ceiling(MaxHealth * fraction));
+        int healthBefore = CurrentHealth;
+
+        _health.Heal(amount);
+
+        return CurrentHealth > healthBefore;
+    }
+
+    private bool TryRestoreStaminaToFull()
+    {
+        if (_action == e_PlayerAction.Death || CurrentStamina >= MaxStamina)
+            return false;
+
+        CurrentStamina = MaxStamina;
+        staminaRegenTimer = 0f;
+        return true;
+    }
 
     private bool WasPressed(KeyboardState keyboard, Keys key)
     {

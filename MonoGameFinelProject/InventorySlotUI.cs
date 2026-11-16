@@ -99,6 +99,7 @@ public class InventorySlotUI : IDrawable, IUpdatable
         currentItemPrice = template.ItemPrice;
 
         itemIcon = new Sprite(template.SpriteName);
+        itemIcon._sourceRectangle = template._sourceRectangle;
         float targetIconSize = slotSize * 0.55f;
         float scale = targetIconSize / 32f;
         itemIcon._transform._scale = new Vector2(scale);
