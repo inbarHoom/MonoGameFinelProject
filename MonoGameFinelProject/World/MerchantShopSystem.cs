@@ -9,7 +9,7 @@ namespace MonoGameFinelProject;
 public sealed class MerchantShopSystem : IDrawable, IUpdatable
 {
     private const float OfferRange = 180f;
-    private const float MerchantRange = 220f;
+    private const float MerchantRange = 120f;
     private const float OfferScale = 1.25f;
     private const float OfferSize = 32f * OfferScale;
     private const float TableScaleX = 4f;
@@ -199,9 +199,7 @@ public sealed class MerchantShopSystem : IDrawable, IUpdatable
             float promptWidth =
                 _sellPrompt._sourceRectangle.Width *
                 _sellPrompt._transform._scale.X;
-            _sellPrompt._transform._position = new Vector2(
-                merchantCenterX - promptWidth / 2f,
-                merchant._transform._position.Y + 8f);
+            _sellPrompt._transform._position = new Vector2(merchantCenterX + promptWidth , merchant._transform._position.Y + 2f);
             _sellPrompt.Update(gameTime);
         }
     }
