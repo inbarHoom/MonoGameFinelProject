@@ -172,7 +172,7 @@ public class Game1 : Game
     void Init()
     {
         AudioManager.PlaySong("Journey" , true , 0.1f);
-        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0.1f));
+        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
         SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
         SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
         SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1f));
