@@ -13,7 +13,7 @@ public class King : Enemy
     private const string Hit = "KingHit";
     private const string Death = "KingDeath";
 
-    private const int AttackHitFrame = 4;
+    private const int AttackHitFrame = 3;
 
     public King() : base(Idle, 180)
     {
