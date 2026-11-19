@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using ButtonState = Microsoft.Xna.Framework.Input.ButtonState;
+using Keys = Microsoft.Xna.Framework.Input.Keys;
+
 namespace MonoGameFinelProject;
 
 public class Game1 : Game
@@ -31,6 +35,11 @@ public class Game1 : Game
     AudioManager _audioManager = null;
     private SpriteFont dungeonFont;
     private Sprite _mouseCursor;
+    private MenuButton _resumeButton;
+    private MenuButton _menuButton;
+    private Sprite optionsIcon;
+    private Sprite escPrompt;
+    private MenuButton _quitButton;
 
     public Game1()
     {
@@ -378,27 +387,25 @@ public class Game1 : Game
            ,keyScale); 
        AddHudSprite(invRight);
        
-       float pauseButtonX = ScreenSize.X - 100f;
-       float pauseButtonY = 20f;
+       int pauseButtonX = (int)ScreenSize.X - 100;
+       int pauseButtonY = 20;
        
        Spritesheet borderSheet = SpriteManager.GetSprite("BorderSheet");
 
        Rectangle menuBorder = borderSheet[1, 3]; // menu border
+       
+       Spritesheet optionsSheet = SpriteManager.GetSprite("Options");
 
-       var pauseButton = new Sprite("BorderSheet")
-       {
-         _sourceRectangle  = borderSheet[3, 0] // button bordeer   
-       };
-       pauseButton._transform._position = new Vector2(pauseButtonX, pauseButtonY);
-       pauseButton._transform._scale = new Vector2(1.25f);
-       AddHudSprite(pauseButton);
+       _menuButton = new MenuButton(
+           new Rectangle(pauseButtonX, pauseButtonY, 80, 80),
+           "",
+           dungeonFont,
+           () => _currentScreen = GameScreen.Paused,
+           optionsSheet.texture,
+           optionsSheet[0, 0]);
        
-       var optionsIcon = new Sprite("Options");
-       optionsIcon._transform._position = new Vector2(pauseButtonX + 19f, pauseButtonY + 19f);
-       optionsIcon._transform._scale = new Vector2(0.65f);
-       AddHudSprite(optionsIcon);
        
-       var escPrompt = new KeyboardPrompt(
+        escPrompt = new KeyboardPrompt(
            1, // selects the KeyboardSymbols sheet
            Keys.Escape,
            new Rectangle(0, 0, 16, 16),   // ESC released
@@ -411,6 +418,19 @@ public class Game1 : Game
        };
        AddHudSprite(escPrompt);
        
+       _resumeButton = new MenuButton(
+           new Rectangle(820, 420, 280, 80),
+           "Resume",
+           dungeonFont,
+           () => _currentScreen = GameScreen.Playing,
+           2f);
+
+       _quitButton = new MenuButton(
+           new Rectangle(820, 520, 280, 80),
+           "Quit",
+           dungeonFont,
+           () => Exit(),
+           2f);
        
        _mouseCursor = new Sprite("Cursor")
        {
@@ -437,6 +457,15 @@ public class Game1 : Game
             _currentScreen = GameScreen.Paused;
         else if (escapePressed && _currentScreen == GameScreen.Paused)
             _currentScreen = GameScreen.Playing;
+        
+        if (_currentScreen == GameScreen.Paused)
+        {
+            _resumeButton.Update();
+            _quitButton.Update();
+        }
+        if (_currentScreen == GameScreen.Playing)
+            _menuButton.Update();
+        
         if (_currentScreen == GameScreen.Playing && !GameOver)
         {
             SceneManager.Instance.Update(gameTime);
@@ -452,10 +481,19 @@ public class Game1 : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
+       
         SceneManager.Instance.Draw(_spriteBatch);
-        SceneManager.Instance.Draw(_spriteBatch);
-        _mouseCursor.Draw(_spriteBatch);
+        _menuButton.Draw(_spriteBatch);
+        escPrompt.Draw(_spriteBatch);
         
+        if (_currentScreen == GameScreen.Paused)
+        {
+            _resumeButton.Draw(_spriteBatch);
+            _quitButton.Draw(_spriteBatch);
+        }
+       
+        
+        _mouseCursor.Draw(_spriteBatch);
         _spriteBatch.End();
         base.Draw(gameTime);
     }
@@ -489,24 +527,24 @@ public class Game1 : Game
     }
     
     private void SpawnLevel() 
-    {
-   const float sectionWidth = LevelManager.SectionWidth;
-
-    var section1 = new LevelSection(0, sectionWidth);
-    var section2 = new LevelSection(sectionWidth, sectionWidth * 2);
-    var section3 = new LevelSection(sectionWidth * 2, sectionWidth * 3);
-    var section4 = new LevelSection(sectionWidth * 3, sectionWidth * 4);
-    var section5 = new LevelSection(sectionWidth * 4, sectionWidth * 5);
-    var section6 = new LevelSection(sectionWidth * 5, sectionWidth * 6);
-    var section7 = new LevelSection(sectionWidth * 6, sectionWidth * 7);
-
-    _levelManager.AddSection(section1);
-    _levelManager.AddSection(section2);
-    _levelManager.AddSection(section3);
-    _levelManager.AddSection(section4);
-    _levelManager.AddSection(section5);
-    _levelManager.AddSection(section6);
-    _levelManager.AddSection(section7); 
+    { 
+        const float sectionWidth = LevelManager.SectionWidth;
+        
+        var section1 = new LevelSection(0, sectionWidth);
+        var section2 = new LevelSection(sectionWidth, sectionWidth * 2);
+        var section3 = new LevelSection(sectionWidth * 2, sectionWidth * 3);
+        var section4 = new LevelSection(sectionWidth * 3, sectionWidth * 4);
+        var section5 = new LevelSection(sectionWidth * 4, sectionWidth * 5);
+        var section6 = new LevelSection(sectionWidth * 5, sectionWidth * 6);
+        var section7 = new LevelSection(sectionWidth * 6, sectionWidth * 7);
+        
+        _levelManager.AddSection(section1);
+        _levelManager.AddSection(section2);
+        _levelManager.AddSection(section3);
+        _levelManager.AddSection(section4);
+        _levelManager.AddSection(section5);
+        _levelManager.AddSection(section6);
+        _levelManager.AddSection(section7); 
 // chests
     // Section 1: 3 goblins
     var chest1 = SceneManager.Create<Chest>();
