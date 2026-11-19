@@ -14,7 +14,7 @@ public class KeyboardPrompt : Sprite
     public bool AutoFlicker { get; set; } = false;
     private float flickerTimer;
     private bool flickerState;
-    private const float FlickerInterval = 0.12f;
+    public float FlickerInterval { get; set; } = 0.12f;
         
     public KeyboardPrompt(
         Keys key,

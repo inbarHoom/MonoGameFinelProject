@@ -37,9 +37,17 @@ public class Sprite : IDrawable , IUpdatable
     public virtual void Draw(SpriteBatch spriteBatch)
     {
         if (_texture == null) return;
+        
+        float zoom = UseCamera ? Camera2D.Zoom : 1f;
+        
         Vector2 drawPosition = UseCamera
-            ? _transform._position - Camera2D.Position
+            ? new Vector2(
+                (_transform._position.X - Camera2D.Position.X) * zoom,
+                Game1.ScreenSize.Y / 2f
+                + (_transform._position.Y - Game1.ScreenSize.Y / 2f) * zoom - 200)
             : _transform._position;
+        
+        Vector2 drawScale = _transform._scale * zoom;
         
         spriteBatch.Draw(_texture,
             drawPosition, 
@@ -47,7 +55,7 @@ public class Sprite : IDrawable , IUpdatable
             _color,
             MathHelper.ToRadians(_transform._rotation),
             _origin, 
-            _transform._scale, 
+            drawScale, 
             _effects,
             sortingLayer
         );

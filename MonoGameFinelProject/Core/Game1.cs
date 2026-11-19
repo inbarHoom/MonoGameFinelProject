@@ -7,6 +7,17 @@ namespace MonoGameFinelProject;
 
 public class Game1 : Game
 {
+    private enum GameScreen
+    {
+        MainMenu,
+        Playing,
+        Paused,
+        Lobby
+    }
+
+    private GameScreen _currentScreen = GameScreen.Playing;
+    private KeyboardState _previousKeyboardState;
+    
     public const float LevelWidth = 16800f;
     private Player _player;
     private readonly LevelManager _levelManager = new();
@@ -19,6 +30,7 @@ public class Game1 : Game
     SpriteManager _spriteManager = null;
     AudioManager _audioManager = null;
     private SpriteFont dungeonFont;
+    private Sprite _mouseCursor;
 
     public Game1()
     {
@@ -31,6 +43,7 @@ public class Game1 : Game
         ScreenSize.X = _graphics.PreferredBackBufferWidth;
         ScreenSize.Y = _graphics.PreferredBackBufferHeight;
         _graphics.IsFullScreen = true;
+        IsMouseVisible = false;
     }
 
     public static bool GameOver { get; set; }
@@ -83,6 +96,9 @@ public class Game1 : Game
         
         SpriteManager.AddSprite("KeyboardABC", "UI/kb_dark_alphanumeric");
         SpriteManager.AddSprite("KeyboardSymbols", "UI/kb_dark_symbols");
+        SpriteManager.AddSprite("BorderSheet" , "UI/09 Border 03" ,4,5);
+        SpriteManager.AddSprite("Cursor", "UI/HandCorsur" ,1,2);
+        SpriteManager.AddSprite("Options", "UI/ExtraIcon02");
 // Items
         SpriteManager.AddSprite("Potions", "SpriteSheets/Items/items 32x32" , 4 ,4);
         SpriteManager.AddSprite("GoblinToe", "SpriteSheets/Items/Icon2");
@@ -175,7 +191,7 @@ public class Game1 : Game
         SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
         SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
         SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
-        SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1f));
+        SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1.5f));
         SpawnLevel();
         var floor = new Sprite("Pixel");
         floor._transform._position = new Vector2(0, 940);
@@ -361,21 +377,73 @@ public class Game1 : Game
            new Vector2(inventorySlot._transform._position.X - keyOffset.X + 60,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
            ,keyScale); 
        AddHudSprite(invRight);
+       
+       float pauseButtonX = ScreenSize.X - 100f;
+       float pauseButtonY = 20f;
+       
+       Spritesheet borderSheet = SpriteManager.GetSprite("BorderSheet");
+
+       Rectangle menuBorder = borderSheet[1, 3]; // menu border
+
+       var pauseButton = new Sprite("BorderSheet")
+       {
+         _sourceRectangle  = borderSheet[3, 0] // button bordeer   
+       };
+       pauseButton._transform._position = new Vector2(pauseButtonX, pauseButtonY);
+       pauseButton._transform._scale = new Vector2(1.25f);
+       AddHudSprite(pauseButton);
+       
+       var optionsIcon = new Sprite("Options");
+       optionsIcon._transform._position = new Vector2(pauseButtonX + 19f, pauseButtonY + 19f);
+       optionsIcon._transform._scale = new Vector2(0.65f);
+       AddHudSprite(optionsIcon);
+       
+       var escPrompt = new KeyboardPrompt(
+           1, // selects the KeyboardSymbols sheet
+           Keys.Escape,
+           new Rectangle(0, 0, 16, 16),   // ESC released
+           new Rectangle(16, 0, 16, 16),  // ESC pressed
+           new Vector2(pauseButtonX - 20f, pauseButtonY + 52f),
+           3f,
+           true)
+       {
+           FlickerInterval = 1f
+       };
+       AddHudSprite(escPrompt);
+       
+       
+       _mouseCursor = new Sprite("Cursor")
+       {
+           UseCamera = false,
+           _sourceRectangle = SpriteManager.GetSprite("Cursor")[0, 0]
+       };
+       _mouseCursor._transform._scale = new Vector2(2f);
     }
     
     protected override void Update(GameTime gameTime)
     {
+        MouseState mouse = Mouse.GetState();
+
+        _mouseCursor._transform._position = new Vector2(mouse.X, mouse.Y);
+        _mouseCursor._sourceRectangle = SpriteManager.GetSprite("Cursor")[mouse.LeftButton == ButtonState.Pressed ? 1 : 0, 0];
         
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||
-            Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-        if (!GameOver)
+        KeyboardState keyboard = Keyboard.GetState();
+
+        bool escapePressed =
+            keyboard.IsKeyDown(Keys.Escape) &&
+            !_previousKeyboardState.IsKeyDown(Keys.Escape);
+     
+        if (escapePressed && _currentScreen == GameScreen.Playing)
+            _currentScreen = GameScreen.Paused;
+        else if (escapePressed && _currentScreen == GameScreen.Paused)
+            _currentScreen = GameScreen.Playing;
+        if (_currentScreen == GameScreen.Playing && !GameOver)
         {
             SceneManager.Instance.Update(gameTime);
             _levelManager.Update(_player);
             Camera2D.Follow(_player, LevelWidth, ScreenSize.X);
         }
-
+        _previousKeyboardState = keyboard;
         base.Update(gameTime);
     }
 
@@ -385,6 +453,8 @@ public class Game1 : Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
         SceneManager.Instance.Draw(_spriteBatch);
+        SceneManager.Instance.Draw(_spriteBatch);
+        _mouseCursor.Draw(_spriteBatch);
         
         _spriteBatch.End();
         base.Draw(gameTime);
@@ -529,7 +599,7 @@ public class Game1 : Game
     SpawnEnemy<King>(section7, section7.Left + 2250f, SpriteEffects.None);
     SpawnEnemy<DeathBringer>(section7, section7.Left + 2370f, SpriteEffects.None);
 
-    
+   
 }
     private static void PlaceChest(Chest chest, float worldX)
     {
