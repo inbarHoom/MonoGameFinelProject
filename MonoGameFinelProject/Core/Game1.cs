@@ -16,6 +16,7 @@ public class Game1 : Game
         MainMenu,
         Playing,
         Paused,
+        Settings,
         Lobby
     }
 
@@ -40,6 +41,11 @@ public class Game1 : Game
     private Sprite optionsIcon;
     private Sprite escPrompt;
     private MenuButton _quitButton;
+    private MenuButton _settingsButton;
+    
+    private bool _waitForMouseReleaseBeforeSliders;
+    private VolumeSlider _musicSlider;
+    private VolumeSlider _sfxSlider;
 
     public Game1()
     {
@@ -208,6 +214,20 @@ public class Game1 : Game
         floor._color = Color.Transparent;
         SceneManager.Add(floor);
 
+        _musicSlider = new VolumeSlider(
+            new Rectangle(800, 430, 320, 12),
+            "Music",
+            AudioManager.SongVolume,
+            dungeonFont,
+            value => AudioManager.SongVolume = value);
+
+        _sfxSlider = new VolumeSlider(
+            new Rectangle(800, 530, 320, 12),
+            "Sound Effects",
+            AudioManager.SoundEffectVolume,
+            dungeonFont,
+            value => AudioManager.SoundEffectVolume = value);
+        
         var floorCollider = new Collider
         {
             Parent = floor,
@@ -424,9 +444,17 @@ public class Game1 : Game
            dungeonFont,
            () => _currentScreen = GameScreen.Playing,
            2f);
+       
+       _settingsButton = new MenuButton(
+           new Rectangle(820, 520, 280, 80),
+           "Settings",
+           dungeonFont,
+           () => {     _currentScreen = GameScreen.Settings;
+               _waitForMouseReleaseBeforeSliders = true; },
+           2f);
 
        _quitButton = new MenuButton(
-           new Rectangle(820, 520, 280, 80),
+           new Rectangle(820, 620, 280, 80),
            "Quit",
            dungeonFont,
            () => Exit(),
@@ -443,7 +471,8 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         MouseState mouse = Mouse.GetState();
-
+        GameScreen screenAtStart = _currentScreen;
+        
         _mouseCursor._transform._position = new Vector2(mouse.X, mouse.Y);
         _mouseCursor._sourceRectangle = SpriteManager.GetSprite("Cursor")[mouse.LeftButton == ButtonState.Pressed ? 1 : 0, 0];
         
@@ -453,14 +482,35 @@ public class Game1 : Game
             keyboard.IsKeyDown(Keys.Escape) &&
             !_previousKeyboardState.IsKeyDown(Keys.Escape);
      
-        if (escapePressed && _currentScreen == GameScreen.Playing)
-            _currentScreen = GameScreen.Paused;
-        else if (escapePressed && _currentScreen == GameScreen.Paused)
-            _currentScreen = GameScreen.Playing;
+        if (escapePressed)
+        {
+            if (_currentScreen == GameScreen.Playing)
+                _currentScreen = GameScreen.Paused;
+            else if (_currentScreen == GameScreen.Paused)
+                _currentScreen = GameScreen.Playing;
+            else if (_currentScreen == GameScreen.Settings)
+            {
+                _currentScreen = GameScreen.Paused;
+            }
+        }
+        if(_currentScreen == GameScreen.Settings && screenAtStart == GameScreen.Settings)
+        {
+            if (_waitForMouseReleaseBeforeSliders)
+            {
+                if (mouse.LeftButton == ButtonState.Released)
+                    _waitForMouseReleaseBeforeSliders = false;
+            }
+            else
+            {
+                _musicSlider.Update();
+                _sfxSlider.Update();
+            }
+        }
         
         if (_currentScreen == GameScreen.Paused)
         {
             _resumeButton.Update();
+            _settingsButton.Update();
             _quitButton.Update();
         }
         if (_currentScreen == GameScreen.Playing)
@@ -472,6 +522,7 @@ public class Game1 : Game
             _levelManager.Update(_player);
             Camera2D.Follow(_player, LevelWidth, ScreenSize.X);
         }
+        
         _previousKeyboardState = keyboard;
         base.Update(gameTime);
     }
@@ -486,13 +537,40 @@ public class Game1 : Game
         _menuButton.Draw(_spriteBatch);
         escPrompt.Draw(_spriteBatch);
         
+        if (_currentScreen == GameScreen.Paused ||
+            _currentScreen == GameScreen.Settings)
+        {
+            Texture2D pixel = SpriteManager.GetSprite("Pixel").texture;
+            _spriteBatch.Draw(
+                pixel,
+                new Rectangle(0, 0, (int)ScreenSize.X, (int)ScreenSize.Y),
+                Color.Black * 0.65f);
+
+            Spritesheet borders = SpriteManager.GetSprite("BorderSheet");
+            Rectangle panelBounds = new Rectangle(620, 180, 680, 720);
+
+            _spriteBatch.Draw(
+                borders.texture,
+                panelBounds,
+                borders[1, 3],
+                Color.White);
+        }
+        
         if (_currentScreen == GameScreen.Paused)
         {
             _resumeButton.Draw(_spriteBatch);
+            _settingsButton.Draw(_spriteBatch);
             _quitButton.Draw(_spriteBatch);
         }
-       
-        
+
+        if (_currentScreen == GameScreen.Settings)
+        {
+            _spriteBatch.DrawString(dungeonFont, "Settings", new Vector2(910, 270), Color.White, 
+                0f, Vector2.Zero, new Vector2(2f), SpriteEffects.None, 0f);
+            _musicSlider.Draw(_spriteBatch);
+            _sfxSlider.Draw(_spriteBatch);
+        }
+
         _mouseCursor.Draw(_spriteBatch);
         _spriteBatch.End();
         base.Draw(gameTime);
