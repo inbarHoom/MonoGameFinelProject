@@ -19,13 +19,17 @@ public class Game1 : Game
         Settings,
         Lobby
     }
-
-    private GameScreen _currentScreen = GameScreen.Playing;
+    
+    private readonly ScreenManager _screenManager = new();
+    private GameScreen _currentScreen = GameScreen.MainMenu;
+    private GameScreen _settingsReturnScreen;
     private KeyboardState _previousKeyboardState;
     
-    public const float LevelWidth = 16800f;
+    private LevelDefinition _activeLevelDefinition;
+    private float LevelWidth => _activeLevelDefinition.WorldWidth;
+    
     private Player _player;
-    private readonly LevelManager _levelManager = new();
+    private  LevelManager _levelManager = new();
     private readonly List<MerchantSiteInfo> _merchantSites = new();
     private const float FloorY = 1100;
     
@@ -42,10 +46,11 @@ public class Game1 : Game
     private Sprite escPrompt;
     private MenuButton _quitButton;
     private MenuButton _settingsButton;
-    
+    private MenuButton _mainMenuButton;
     private bool _waitForMouseReleaseBeforeSliders;
     private VolumeSlider _musicSlider;
     private VolumeSlider _sfxSlider;
+   
 
     public Game1()
     {
@@ -95,6 +100,7 @@ public class Game1 : Game
         AudioManager.AddSoundEffect("GoblinAttack2", "Audio/SFX/EnemiesSFX/slash2");
         
 // UI
+        SpriteManager.AddSprite("MainMenuBackground", "UI/BackGroundMainMenu");
     // Fonts
         dungeonFont = Content.Load<SpriteFont>("Fonts/DungeonFont");
     //Abilities
@@ -203,14 +209,17 @@ public class Game1 : Game
     void Init()
     {
         AudioManager.PlaySong("Journey" , true , 0.1f);
-        SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
-        SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
-        SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
-        SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1.5f));
+        _activeLevelDefinition = FirstLevelDefinition.Create();
+        AddParallaxLayers(ParallaxPlacement.Background);
         SpawnLevel();
+        // SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
+        // SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
+        // SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
+        // SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1.5f));
+       // SpawnLevel();
         var floor = new Sprite("Pixel");
-        floor._transform._position = new Vector2(0, 940);
-        floor._transform._scale = new Vector2(LevelWidth, 20);
+        floor._transform._position = new Vector2(0, _activeLevelDefinition.GroundY);
+        floor._transform._scale = new Vector2(_activeLevelDefinition.WorldWidth, 20);
         floor._color = Color.Transparent;
         SceneManager.Add(floor);
 
@@ -239,7 +248,8 @@ public class Game1 : Game
         _player.CreateCollider();
         _player._transform._position = new Vector2(180, 500);
        
-        SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
+        AddParallaxLayers(ParallaxPlacement.Foreground);
+       // SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
 
         var merchantShop = new MerchantShopSystem(
             _player,
@@ -316,54 +326,70 @@ public class Game1 : Game
         float pickupSlotX = rightSlotX + slotSize + attackSlotGap; 
         
         float inventorySlotX = ScreenSize.X - slotSize - rightMargin;
+        
        var leftSlot = new Sprite("ItemSlot");
        leftSlot._transform._position = new Vector2(leftSlotX, slotY);
        leftSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(leftSlot);
+       
        var rightSlot = new Sprite("ItemSlot");
        rightSlot._transform._position = new Vector2(rightSlotX, slotY);
        rightSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(rightSlot);
+       
        var pickupSlot = new Sprite("ItemSlot");
        pickupSlot._transform._position = new Vector2(pickupSlotX, slotY);
        pickupSlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(pickupSlot);
+       
        var inventorySlot = new Sprite("ItemSlot");
        inventorySlot._transform._position = new Vector2(inventorySlotX, slotY);
        inventorySlot._transform._scale = new Vector2(itemSlotScale);
        AddHudSprite(inventorySlot);
+       
        SceneManager.Add(new InventorySlotUI(_player, new Vector2(inventorySlotX, slotY), slotSize, dungeonFont));
        var lightIcon = new Sprite("LightAttackUI");
        lightIcon._transform._position= new Vector2(leftSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        lightIcon._transform._scale = new Vector2(iconScale);
        AddHudSprite(lightIcon);
+       
        var heavyIcon = new Sprite("HeavyAttackUI");
        heavyIcon._transform._position = new Vector2(rightSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        heavyIcon._transform._scale = new Vector2(iconScale);
        AddHudSprite(heavyIcon);
+       
        float pickupIconScale = iconSize / 32f;
        var pickupIcon = new Sprite("PickupIcon");
        pickupIcon._transform._position = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2, slotY + (slotHeight - iconSize) / 2);
        pickupIcon._transform._scale = new Vector2(pickupIconScale);
        AddHudSprite(pickupIcon);
+       
        Vector2 lightIconPosition = new Vector2(
            leftSlotX + (slotWidth - iconSize) / 2, 
            slotY + (slotHeight - iconSize) / 2);
+       
        Vector2 heavyIconPosition = new Vector2(
            rightSlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
+       
        float keyScale = 4f;
+       
        Vector2 keyOffset = new Vector2(-30, -30);
+       
        Vector2 pickupSlotPosition = new Vector2(pickupSlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
+       
        Vector2 inventorySlotPosition = new Vector2( inventorySlotX + (slotWidth - iconSize) / 2,
            slotY + (slotHeight - iconSize) / 2);
+       
        Vector2  lightKeyPosition = new Vector2(
            (int)MathF.Round(lightIconPosition.X + keyOffset.X),
            (int)MathF.Round(lightIconPosition.Y + keyOffset.Y));
+       
        Vector2  heavyKeyPosition = new Vector2(
            (int)MathF.Round(heavyIconPosition.X + keyOffset.X),
            (int)MathF.Round(heavyIconPosition.Y + keyOffset.Y));
+       
        var lightKeyPrompt = new KeyboardPrompt(
            Keys.J,
            new Rectangle(0, 144, 16, 16), // J released
@@ -371,6 +397,7 @@ public class Game1 : Game
            lightKeyPosition,
            keyScale);
        AddHudSprite(lightKeyPrompt);
+       
        var heavyPrompt  = new KeyboardPrompt(
            Keys.K,
            new Rectangle(0, 160, 16, 16), // K released
@@ -378,6 +405,7 @@ public class Game1 : Game
            heavyKeyPosition,
            keyScale);
        AddHudSprite(heavyPrompt);
+       
        var pickupPrompt =new KeyboardPrompt(
            Keys.E,
            new Rectangle(0, 64, 16, 16), // E released
@@ -385,6 +413,7 @@ public class Game1 : Game
            pickupSlotPosition + keyOffset,
            keyScale);
        AddHudSprite(pickupPrompt);
+       
        var interactPrompt =new KeyboardPrompt(
            Keys.F,
            new Rectangle(0, 80, 16, 16), // F released
@@ -392,6 +421,7 @@ public class Game1 : Game
            inventorySlotPosition + keyOffset,
            keyScale);
        AddHudSprite(interactPrompt);
+       
       var invLeft =new KeyboardPrompt( 1,
            Keys.OemComma,
            new Rectangle(0, 270, 16, 16), // < released
@@ -399,6 +429,7 @@ public class Game1 : Game
            new Vector2(inventorySlot._transform._position.X + keyOffset.X - 25,inventorySlot._transform._position.Y + keyOffset.Y + 50 )
            ,keyScale); 
       AddHudSprite(invLeft);
+      
        var invRight = new KeyboardPrompt( 1,
            Keys.OemPeriod,
            new Rectangle(0, 254, 16, 16), // < released
@@ -449,12 +480,22 @@ public class Game1 : Game
            new Rectangle(820, 520, 280, 80),
            "Settings",
            dungeonFont,
-           () => {     _currentScreen = GameScreen.Settings;
-               _waitForMouseReleaseBeforeSliders = true; },
+           () =>  {
+               _settingsReturnScreen = GameScreen.Paused;
+               _currentScreen = GameScreen.Settings;
+               _waitForMouseReleaseBeforeSliders = true;
+           },
+           2f);
+       
+       _mainMenuButton = new MenuButton(
+           new Rectangle(820, 620, 280, 80),
+           "Main Menu",
+           dungeonFont,
+           () =>     _currentScreen = GameScreen.MainMenu,
            2f);
 
        _quitButton = new MenuButton(
-           new Rectangle(820, 620, 280, 80),
+           new Rectangle(820, 720, 280, 80),
            "Quit",
            dungeonFont,
            () => Exit(),
@@ -466,6 +507,20 @@ public class Game1 : Game
            _sourceRectangle = SpriteManager.GetSprite("Cursor")[0, 0]
        };
        _mouseCursor._transform._scale = new Vector2(2f);
+       
+       _screenManager.ChangeScreen(new MainMenuScreen(dungeonFont, 
+           onPlay: () =>
+           {
+               _currentScreen = GameScreen.Playing;
+              // _screenManager.ChangeScreen(new LobbyScreen());
+           },
+           onSettings: () =>
+           {
+               _settingsReturnScreen = GameScreen.MainMenu;
+               _currentScreen = GameScreen.Settings;
+               _waitForMouseReleaseBeforeSliders = true;
+           },
+           onQuit: () => Exit()));
     }
     
     protected override void Update(GameTime gameTime)
@@ -490,8 +545,13 @@ public class Game1 : Game
                 _currentScreen = GameScreen.Playing;
             else if (_currentScreen == GameScreen.Settings)
             {
-                _currentScreen = GameScreen.Paused;
+                _currentScreen = _settingsReturnScreen;
             }
+        }
+        if (_currentScreen == GameScreen.MainMenu ||
+            _currentScreen == GameScreen.Lobby)
+        {
+            _screenManager.Update(gameTime);
         }
         if(_currentScreen == GameScreen.Settings && screenAtStart == GameScreen.Settings)
         {
@@ -511,6 +571,7 @@ public class Game1 : Game
         {
             _resumeButton.Update();
             _settingsButton.Update();
+            _mainMenuButton.Update();
             _quitButton.Update();
         }
         if (_currentScreen == GameScreen.Playing)
@@ -533,9 +594,22 @@ public class Game1 : Game
         _spriteBatch.Begin(samplerState: SamplerState.PointClamp);
 
        
-        SceneManager.Instance.Draw(_spriteBatch);
-        _menuButton.Draw(_spriteBatch);
-        escPrompt.Draw(_spriteBatch);
+        bool showingGameplay =
+            _currentScreen == GameScreen.Playing ||
+            _currentScreen == GameScreen.Paused ||
+            (_currentScreen == GameScreen.Settings &&
+             _settingsReturnScreen == GameScreen.Paused);
+
+        if (showingGameplay)
+            SceneManager.Instance.Draw(_spriteBatch);
+        else
+            _screenManager.Draw(_spriteBatch);
+
+        if (_currentScreen == GameScreen.Playing)
+        {
+            _menuButton.Draw(_spriteBatch);
+            escPrompt.Draw(_spriteBatch);
+        }
         
         if (_currentScreen == GameScreen.Paused ||
             _currentScreen == GameScreen.Settings)
@@ -560,6 +634,7 @@ public class Game1 : Game
         {
             _resumeButton.Draw(_spriteBatch);
             _settingsButton.Draw(_spriteBatch);
+            _mainMenuButton.Draw(_spriteBatch);
             _quitButton.Draw(_spriteBatch);
         }
 
@@ -575,6 +650,23 @@ public class Game1 : Game
         _spriteBatch.End();
         base.Draw(gameTime);
     }
+    
+    private void AddParallaxLayers(ParallaxPlacement placement)
+    {
+        foreach (ParallaxDefinition layer in _activeLevelDefinition.ParallaxLayers)
+        {
+            if (layer.Placement != placement)
+                continue;
+
+            SceneManager.Add(new ParallaxLayer(
+                layer.SpriteName,
+                layer.Y,
+                layer.Scale,
+                layer.Parallax,
+                layer.BottomY));
+        }
+    }
+    
     private static void AddHudSprite(Sprite sprite)
     {
         sprite.UseCamera = false;
@@ -606,6 +698,12 @@ public class Game1 : Game
     
     private void SpawnLevel() 
     { 
+        //LevelDefinition definition = FirstLevelDefinition.Create();
+        var builder = new LevelBuilder();
+
+        _levelManager = builder.Build(_activeLevelDefinition, out List<MerchantSiteInfo> sites);
+        _merchantSites.AddRange(sites);
+        /*
         const float sectionWidth = LevelManager.SectionWidth;
         
         var section1 = new LevelSection(0, sectionWidth);
@@ -714,6 +812,7 @@ public class Game1 : Game
     SpawnEnemy<Knight>(section7, section7.Left + 1900f);
     SpawnEnemy<King>(section7, section7.Left + 2250f, SpriteEffects.None);
     SpawnEnemy<DeathBringer>(section7, section7.Left + 2370f, SpriteEffects.None);
+    */
 
    
 }

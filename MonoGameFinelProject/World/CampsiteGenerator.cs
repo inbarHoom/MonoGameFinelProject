@@ -55,17 +55,15 @@ public sealed class CampsiteGenerator
         }
     }
 
-    public MerchantSiteInfo GenerateMerchantCampsite(
-        LevelSection section,
-        float groundY)
+    public MerchantSiteInfo GenerateMerchantCampsite(LevelSection section, float groundY, float? startX = null)
     {
-        float x = section.Left + (section.Right - section.Left - SiteWidth) / 2f;
+        float x = startX ?? section.Left + (section.Right - section.Left - SiteWidth) / 2f;
 
+        if (x < section.Left || x + SiteWidth > section.Right)
+            throw new ArgumentOutOfRangeException(nameof(startX), "The merchant campsite must fit inside its section.");
+        
         if (OverlapsChest(x, section.Chests))
-        {
-            throw new InvalidOperationException(
-                "The merchant campsite overlaps a chest.");
-        }
+            throw new InvalidOperationException("The merchant campsite overlaps a chest.");
 
         AddAtlasProp(TentA, x, groundY, PropScale);
 

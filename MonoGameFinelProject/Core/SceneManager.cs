@@ -97,6 +97,13 @@ public class SceneManager : IUpdatable , IDrawable
         
       
     }
+    
+    public static void Clear()
+    {
+        updatables.Clear();
+        _drawables.Clear();
+        colliders.Clear();
+    }
 
     public void Draw(SpriteBatch spriteBatch)
     {
