@@ -210,7 +210,7 @@ public class Game1 : Game
     void Init()
     {
         AudioManager.PlaySong("Journey" , true , 0.1f);
-        _activeLevelDefinition = LobbyLevelDefinition.Create();
+        _activeLevelDefinition = FirstLevelDefinition.Create();
         AddParallaxLayers(ParallaxPlacement.Background);
         SpawnLevel();
         // SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
@@ -512,8 +512,8 @@ public class Game1 : Game
        _screenManager.ChangeScreen(new MainMenuScreen(dungeonFont, 
            onPlay: () =>
            {
-               _currentScreen = GameScreen.Lobby;
-               _screenManager.ChangeScreen(new LobbyScreen());
+               _currentScreen = GameScreen.Playing;
+               //_screenManager.ChangeScreen(new LobbyScreen());
            },
            onSettings: () =>
            {
