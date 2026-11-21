@@ -67,7 +67,7 @@ public class LevelBuilder
                 SpawnEnemy(section, enemy, section.Left + enemy.LocalX);
             }
         }
-
+     
         return levelManager;
     }
 

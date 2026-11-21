@@ -597,7 +597,8 @@ public class Game1 : Game
        
         bool showingGameplay =
             _currentScreen == GameScreen.Playing ||
-            _currentScreen == GameScreen.Paused ||
+            _currentScreen == GameScreen.Paused || 
+            _currentScreen == GameScreen.Lobby ||
             (_currentScreen == GameScreen.Settings &&
              _settingsReturnScreen == GameScreen.Paused);
 
