@@ -8,6 +8,7 @@ public static class FirstLevelDefinition
     {
         var level = new LevelDefinition()
         {
+            Purpose = LevelPurpose.Gameplay,
             Id = "level-1",
             DisplayName = "Level 1",
             Difficulty = "Normal",

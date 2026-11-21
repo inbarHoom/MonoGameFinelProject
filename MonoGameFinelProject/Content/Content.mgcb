@@ -413,6 +413,19 @@
 /processorParam:Version=3.8.6.0
 /build:SpriteSheets/Goblin/Take Hit.png
 
+#begin SpriteSheets/GoodKing/Idle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.6.0
+/build:SpriteSheets/GoodKing/Idle.png
+
 #begin SpriteSheets/Items/Icon2.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -919,6 +932,45 @@
 /processorParam:TextureFormat=Color
 /processorParam:Version=3.8.6.0
 /build:SpriteSheets/Mimic/walk.png
+
+#begin SpriteSheets/TestDummy/BREAKING.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.6.0
+/build:SpriteSheets/TestDummy/BREAKING.png
+
+#begin SpriteSheets/TestDummy/HIT.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.6.0
+/build:SpriteSheets/TestDummy/HIT.png
+
+#begin SpriteSheets/TestDummy/IDLE.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.6.0
+/build:SpriteSheets/TestDummy/IDLE.png
 
 #begin Terrain/foliage_cluster_foreground1.png
 /importer:TextureImporter

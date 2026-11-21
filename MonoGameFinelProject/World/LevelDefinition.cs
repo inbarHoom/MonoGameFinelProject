@@ -2,6 +2,12 @@ using System.Collections.Generic;
 
 namespace MonoGameFinelProject;
 
+public enum LevelPurpose
+{
+    Gameplay,
+    Lobby
+}
+
 public enum EnemyKind
 {
     Goblin,
@@ -25,6 +31,7 @@ public enum ParallaxPlacement
 
 public sealed class LevelDefinition
 {
+    public LevelPurpose Purpose { get; set; } = LevelPurpose.Gameplay;
     public string Id { get; set; }
     public string DisplayName { get; set; }
     public string Difficulty { get; set; }
@@ -32,12 +39,16 @@ public sealed class LevelDefinition
     public float SectionWidth { get; set; } = 2400f;
     
     public float ChestPlacementY { get; set; } = 1100f;
+    
+    public float PlayerLocalX { get; set; }
+    public float GoodKingLocalX { get; set; }
     public float GroundY { get; set; } = 940f;
 
     public List<ParallaxDefinition> ParallaxLayers { get; } = new();
     public List<LevelSectionDefinition> Sections { get; } = new();
 
     public float WorldWidth => SectionWidth * Sections.Count;
+    
 }
 
 public sealed class ParallaxDefinition

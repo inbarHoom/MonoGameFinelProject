@@ -141,6 +141,7 @@ public class Game1 : Game
         SpriteManager.AddSprite("MartialHeroDeath", "SpriteSheets/MartialHero/Death", 1, 6);
 // Allies
         SpriteManager.AddSprite("Merchant", "SpriteSheets/Merchant/Idle", 1, 8);
+        SpriteManager.AddSprite("GoodKing","SpriteSheets/GoodKing/Idle", 1, 6);
 // Bomb
         SpriteManager.AddSprite("Bomb", "SpriteSheets/Goblin/Bomb_sprite", 1, 19);
 // Enemies:
@@ -209,7 +210,7 @@ public class Game1 : Game
     void Init()
     {
         AudioManager.PlaySong("Journey" , true , 0.1f);
-        _activeLevelDefinition = FirstLevelDefinition.Create();
+        _activeLevelDefinition = LobbyLevelDefinition.Create();
         AddParallaxLayers(ParallaxPlacement.Background);
         SpawnLevel();
         // SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
@@ -511,8 +512,8 @@ public class Game1 : Game
        _screenManager.ChangeScreen(new MainMenuScreen(dungeonFont, 
            onPlay: () =>
            {
-               _currentScreen = GameScreen.Playing;
-              // _screenManager.ChangeScreen(new LobbyScreen());
+               _currentScreen = GameScreen.Lobby;
+               _screenManager.ChangeScreen(new LobbyScreen());
            },
            onSettings: () =>
            {
