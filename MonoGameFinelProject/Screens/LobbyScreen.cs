@@ -44,7 +44,7 @@ public sealed class LobbyScreen : IGameScreen
         player.CreateCollider();
         player._transform._position = new Vector2(lobbyDefinition.PlayerLocalX, 500);
 
-        var king = new KingNpc(player, new Vector2(lobbyDefinition.GoodKingLocalX, lobbyDefinition.GroundY));
+        var king = new KingNpc(player, new Vector2(lobbyDefinition.GoodKingLocalX + 50, lobbyDefinition.GroundY + 60));
 
         SceneManager.AddBefore(king, player);
     }

@@ -512,7 +512,7 @@ public class Game1 : Game
        _screenManager.ChangeScreen(new MainMenuScreen(dungeonFont, 
            onPlay: () =>
            {
-               _currentScreen = GameScreen.Lobby;
+               _currentScreen = GameScreen.Playing;
                _screenManager.ChangeScreen(new LobbyScreen());
            },
            onSettings: () =>

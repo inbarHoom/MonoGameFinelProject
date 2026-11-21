@@ -12,7 +12,7 @@ public class KingNpc : Animation
     {
         _player = player ?? throw new ArgumentNullException(nameof(player));
 
-        const float scale = 2f;
+        const float scale = 1.5f;
         _transform._scale = new Vector2(scale);
         _transform._position = new Vector2(
             groundPosition.X,
