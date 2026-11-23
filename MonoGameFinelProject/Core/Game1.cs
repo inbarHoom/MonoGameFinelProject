@@ -213,11 +213,6 @@ public class Game1 : Game
         _activeLevelDefinition = FirstLevelDefinition.Create();
         AddParallaxLayers(ParallaxPlacement.Background);
         SpawnLevel();
-        // SceneManager.Add(new ParallaxLayer("TerrainSky", 0, 1f, 0f));
-        // SceneManager.Add(new ParallaxLayer("TerrainHills", 350, 1f, 0.2f));
-        // SceneManager.Add(new ParallaxLayer("TerrainBackgroundTrees", 370, 1f, 0.3f));
-        // SceneManager.Add(new ParallaxLayer("TerrainGround",  900,  0.3f,  1.5f));
-       // SpawnLevel();
         var floor = new Sprite("Pixel");
         floor._transform._position = new Vector2(0, _activeLevelDefinition.GroundY);
         floor._transform._scale = new Vector2(_activeLevelDefinition.WorldWidth, 20);
@@ -250,8 +245,7 @@ public class Game1 : Game
         _player._transform._position = new Vector2(180, 500);
        
         AddParallaxLayers(ParallaxPlacement.Foreground);
-       // SceneManager.Add(new ParallaxLayer("TerrainForegroundFoliage", 1010, 0.2f, 1.2f , 1080));
-
+        
         var merchantShop = new MerchantShopSystem(
             _player,
             dungeonFont,
@@ -513,7 +507,6 @@ public class Game1 : Game
            onPlay: () =>
            {
                _currentScreen = GameScreen.Playing;
-               //_screenManager.ChangeScreen(new LobbyScreen());
            },
            onSettings: () =>
            {
@@ -700,124 +693,12 @@ public class Game1 : Game
     
     private void SpawnLevel() 
     { 
-        //LevelDefinition definition = FirstLevelDefinition.Create();
         var builder = new LevelBuilder();
 
         _levelManager = builder.Build(_activeLevelDefinition, out List<MerchantSiteInfo> sites);
         _merchantSites.AddRange(sites);
-        /*
-        const float sectionWidth = LevelManager.SectionWidth;
         
-        var section1 = new LevelSection(0, sectionWidth);
-        var section2 = new LevelSection(sectionWidth, sectionWidth * 2);
-        var section3 = new LevelSection(sectionWidth * 2, sectionWidth * 3);
-        var section4 = new LevelSection(sectionWidth * 3, sectionWidth * 4);
-        var section5 = new LevelSection(sectionWidth * 4, sectionWidth * 5);
-        var section6 = new LevelSection(sectionWidth * 5, sectionWidth * 6);
-        var section7 = new LevelSection(sectionWidth * 6, sectionWidth * 7);
-        
-        _levelManager.AddSection(section1);
-        _levelManager.AddSection(section2);
-        _levelManager.AddSection(section3);
-        _levelManager.AddSection(section4);
-        _levelManager.AddSection(section5);
-        _levelManager.AddSection(section6);
-        _levelManager.AddSection(section7); 
-// chests
-    // Section 1: 3 goblins
-    var chest1 = SceneManager.Create<Chest>();
-    PlaceChest(chest1, 1200);
-    section1.Chests.Add(chest1);
-    
-    // Section 2: three Goblins and knight
-    var chest2 = SceneManager.Create<Chest>();
-    PlaceChest(chest2, 4500);
-    section2.Chests.Add(chest2);
-
-    // Section 3: intentionally empty
-
-    // Section 4: three Goblins two Knight and fantasy warrior
-    var chest3 = SceneManager.Create<Chest>();
-    PlaceChest(chest3, 7400);
-    section4.Chests.Add(chest3);
-
-    var chest4 = SceneManager.Create<Chest>();
-    PlaceChest(chest4, 7750);
-    section4.Chests.Add(chest4);
-    
-    // Section 5: intentionally empty
-
-    // Section 6
-    var chest5 = SceneManager.Create<Chest>();
-    PlaceChest(chest5, 13200);
-    section6.Chests.Add(chest5);
-
-    var chest6 = SceneManager.Create<Chest>();
-    PlaceChest(chest6, 13400);
-    section6.Chests.Add(chest6);
-
-    // Section 7: chest near the start
-    var chest7 = SceneManager.Create<Chest>();
-    PlaceChest(chest7, 14500);
-    section7.Chests.Add(chest7);
-    
-    var campsites = new CampsiteGenerator();
-
-    foreach (var section in new[]
-             { section1, section2, section3, section4, section5, section6, section7 })
-    {
-        if (section == section3 || section == section5)
-        {
-            _merchantSites.Add(
-                campsites.GenerateMerchantCampsite(section, 940f));
-        }
-        else
-        {
-            campsites.GenerateInSection(section, 940f, 2);
-        }
     }
-// enemies
-    // section 1
-    SpawnEnemy<Goblin>(section1, 700, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section1, 1600);
-    SpawnEnemy<Goblin>(section1, 1900);
-    // section 2
-    SpawnEnemy<Goblin>(section2, 3000);
-    SpawnEnemy<Knight>(section2, 3550);
-    SpawnEnemy<Goblin>(section2, 2650, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section2, 4100, SpriteEffects.None);
-    // section 3
-    
-    // section 4
-    SpawnEnemy<Goblin>(section4, 8050, SpriteEffects.None);
-    SpawnEnemy<Knight>(section4, 8320);
-    SpawnEnemy<Goblin>(section4, 8590);
-    SpawnEnemy<Knight>(section4, 8860);
-    SpawnEnemy<FantasyWarrior>(section4, 9130);
-    SpawnEnemy<Goblin>(section4, 9400, SpriteEffects.None);
-    // section 5
-    
-    // section 6
-    SpawnEnemy<Goblin>(section6, 12250, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section6, 12550);
-    SpawnEnemy<Knight>(section6, 12850);
-    SpawnEnemy<FantasyWarrior>(section6, 13000);
-    SpawnEnemy<Goblin>(section6, 14000);
-    SpawnEnemy<Knight>(section6, 13700);
-    SpawnEnemy<Goblin>(section6, 14250, SpriteEffects.None);
-    // section 7
-    SpawnEnemy<Goblin>(section7, section7.Left + 400f, SpriteEffects.None);
-    SpawnEnemy<Goblin>(section7, section7.Left + 700f);
-    SpawnEnemy<Knight>(section7, section7.Left + 1000f);
-    SpawnEnemy<FantasyWarrior>(section7, section7.Left + 1300f);
-    SpawnEnemy<Goblin>(section7, section7.Left + 1600f);
-    SpawnEnemy<Knight>(section7, section7.Left + 1900f);
-    SpawnEnemy<King>(section7, section7.Left + 2250f, SpriteEffects.None);
-    SpawnEnemy<DeathBringer>(section7, section7.Left + 2370f, SpriteEffects.None);
-    */
-
-   
-}
     private static void PlaceChest(Chest chest, float worldX)
     {
         float chestHeight =
