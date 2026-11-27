@@ -13,6 +13,19 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin ../../../../Downloads/Metroidvania Kit/Metroidvania Kit/UI/Export/ui_selection/ui_select_item3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/processorParam:Version=3.8.6.0
+/build:../../../../Downloads/Metroidvania Kit/Metroidvania Kit/UI/Export/ui_selection/ui_select_item3.png;UI/ui_select_item3.png
+
 #begin Audio/Music/Clement Panchout _ 2022 _ By the river.wav
 /importer:WavImporter
 /processor:SongProcessor
